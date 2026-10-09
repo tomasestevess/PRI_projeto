@@ -1,0 +1,14 @@
+[out:json][timeout:300];
+(
+  nwr["amenity"~"^(restaurant|cafe|bar|pub|fast_food|ice_cream)$"](@BBOX@);
+  nwr["tourism"~"^(attraction|museum|viewpoint|gallery)$"](@BBOX@);
+  nwr["historic"~"^(monument|castle|church|memorial)$"](@BBOX@);
+  nwr["railway"="station"](@BBOX@);
+  nwr["station"="subway"](@BBOX@);
+  nwr["shop"~"^(supermarket|bakery|convenience)$"](@BBOX@);
+  nwr["leisure"~"^(park|beach_resort)$"]["name"](@BBOX@);
+  nwr["natural"="beach"]["name"](@BBOX@);
+  nwr["amenity"="parking"]["access"!="private"](@BBOX@);
+  nwr["highway"="bus_stop"](@BBOX@);
+);
+out center tags;

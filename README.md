@@ -13,18 +13,19 @@ It combines the Inside Airbnb listings and reviews with OpenStreetMap points of 
 | Tomás Esteves | 202205045 | up202205045@up.pt |
 
 ## Setup
-Requires bash, curl and python 3.9+.
+Requires make, bash, curl and python 3.9+. On Windows, install make with `winget install ezwinports.make` and run it from Git Bash.
 
 ```
 pip install -r scripts/requirements.txt
-./get_data.sh
+make collect
 ```
 
-**Script**: downloads the raw data into data/raw/. It takes about 20 minutes, almost all of it fetching Wikipedia. If it is interrupted, run it again and it resumes.
+**make collect**: downloads the raw data into data/raw/. It takes about 20 minutes, almost all of it fetching Wikipedia. If it is interrupted, run it again and it resumes.
 
 ## Structure
 ```
-get_data.sh                  downloads the raw data
+Makefile                     data pipeline (make collect downloads the raw data)
+code/osm_query.overpass.in   Overpass query, @BBOX@ is replaced by each city's bounding box
 scripts/fetch_wikipedia.py   fetches Wikipedia articles
 data/raw/                    raw data
 ```
@@ -46,7 +47,6 @@ The raw data is not tracked by git.
 - neighbourhoods.geojson: neighbourhood boundaries (coordinates).
 
 **OpenStreetMap**
-- query_porto.overpass and query_lisboa.overpass: the query used.
 - pois_porto.json and pois_lisboa.json: Overpass response.
 Categories:
   - food and drink

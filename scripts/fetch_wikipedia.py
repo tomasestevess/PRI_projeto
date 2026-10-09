@@ -86,21 +86,25 @@ def main():
     parser.add_argument("--raw", default="data/raw")
     raw = Path(parser.parse_args().raw)
     out = raw / "wikipedia" / "articles.jsonl"
+    part = out.with_name(out.name + ".part")  # written while fetching, so an interrupted run is not taken as complete
     out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists():
+        out.replace(part)
 
     by_qid, by_tag = load_pois(raw / "osm")
     jobs = [(*tag.split(":", 1), pois) for tag, pois in by_tag.items()] + wikidata_jobs(by_qid)
 
-    done = {(a["lang"], a["title"]) for a in read_jsonl(out)} if out.exists() else set()
+    done = {(a["lang"], a["title"]) for a in read_jsonl(part)} if part.exists() else set()
     todo = [job for job in jobs if job[:2] not in done]
     print(f"{len(todo)} articles to fetch, {len(done)} already done")
 
-    with open(out, "a", encoding="utf-8") as f:
+    with open(part, "a", encoding="utf-8") as f:
         for i, (lang, title, pois) in enumerate(todo, 1):
             article = fetch_article(lang, title)
             print(f"{i}/{len(todo)} {'skipped: ' if article is None else ''}{lang}:{title}")
             if article:
                 f.write(json.dumps({**article, "pois": pois}, ensure_ascii=False) + "\n")
+    part.replace(out)
 
 if __name__ == "__main__":
     main()
