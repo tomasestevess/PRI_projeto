@@ -27,7 +27,12 @@ clean:
 collect: $(FILES)
 
 # Downloads go to .part first so interrupted ones are not mistaken for complete files
-$(RAW)/airbnb_%/listings.csv.gz $(RAW)/airbnb_%/reviews.csv.gz:
+$(RAW)/airbnb_%/listings.csv.gz:
+	mkdir -p $(@D)
+	curl -fL --retry 3 --retry-delay 10 -A "$(UA)" -o $@.part $(AIRBNB)/$(AIRBNB_$*)/$(DATE)/data/$(@F)
+	mv $@.part $@
+
+$(RAW)/airbnb_%/reviews.csv.gz:
 	mkdir -p $(@D)
 	curl -fL --retry 3 --retry-delay 10 -A "$(UA)" -o $@.part $(AIRBNB)/$(AIRBNB_$*)/$(DATE)/data/$(@F)
 	mv $@.part $@

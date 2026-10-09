@@ -1,4 +1,4 @@
-[out:json][timeout:300];
+[out:json][timeout:180][maxsize:268435456];
 (
   nwr["amenity"~"^(restaurant|cafe|bar|pub|fast_food|ice_cream)$"](@BBOX@);
   nwr["tourism"~"^(attraction|museum|viewpoint|gallery)$"](@BBOX@);
