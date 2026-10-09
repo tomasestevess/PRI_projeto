@@ -24,10 +24,10 @@ make collect
 
 ## Structure
 ```
-Makefile                     data pipeline (make collect downloads the raw data)
-code/osm_query.overpass.in   Overpass query, @BBOX@ is replaced by each city's bounding box
-scripts/fetch_wikipedia.py   fetches Wikipedia articles
-data/raw/                    raw data
+Makefile                        data pipeline (make collect downloads the raw data)
+scripts/osm_query.overpass.in   Overpass query, @BBOX@ is replaced by each city's bounding box
+scripts/fetch_wikipedia.py      fetches Wikipedia articles
+data/raw/                       raw data
 ```
 
 ## Data

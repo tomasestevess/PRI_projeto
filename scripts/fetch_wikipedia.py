@@ -58,6 +58,8 @@ def wikidata_jobs(by_qid):
             "action": "wbgetentities", "ids": "|".join(qids[i:i + 50]), "props": "sitelinks",
             "sitefilter": "|".join(f"{lang}wiki" for lang in LANGS),
         })
+        if data is None:  # stop instead of losing 50 POIs; articles.jsonl stays .part, so a rerun resumes
+            raise SystemExit("Wikidata API did not answer; run again to resume")
         for qid, entity in data["entities"].items():
             link = first_link(entity)
             if link:

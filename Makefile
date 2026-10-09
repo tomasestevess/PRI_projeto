@@ -38,9 +38,9 @@ $(RAW)/airbnb_%/neighbourhoods.geojson:
 	mv $@.part $@
 
 # Overpass is rate limited: run without -j
-$(RAW)/osm/pois_%.json: code/osm_query.overpass.in
+$(RAW)/osm/pois_%.json: scripts/osm_query.overpass.in
 	mkdir -p $(@D)
-	sed 's/@BBOX@/$(BBOX_$*)/' $< | curl -sf -m 600 --retry 5 --retry-delay 30 -A "$(UA)" --data-urlencode data@-		https://overpass-api.de/api/interpreter -o $@.part
+	sed 's/@BBOX@/$(BBOX_$*)/' $< | curl -sSf -m 600 --retry 5 --retry-delay 30 -A "$(UA)" --data-urlencode data@-		https://overpass-api.de/api/interpreter -o $@.part
 	grep -q '"elements"' $@.part && ! grep -q 'runtime error' $@.part 		|| { rm -f $@.part; echo "Overpass returned no data; retry later" >&2; exit 1; }
 	mv $@.part $@
 	sleep 5
@@ -58,9 +58,9 @@ process:
 	# Moreover, ensure that data also goes to a known location for easier analysis
 	# TODO: placeholders from the template, uncomment once the scripts exist
 	# mkdir -p processed/...
-	# Rscript code/process_data1.R
-	# sh code/process_data2.sh
-	# $(PYTHON) code/process_data3.py
+	# Rscript scripts/process_data1.R
+	# sh scripts/process_data2.sh
+	# $(PYTHON) scripts/process_data3.py
 
 analyze:
 	# This target is recommended to isolate all data analysis scripts.
@@ -68,11 +68,11 @@ analyze:
 	# which may span several languages. Diversity is key here so data can be better understood.
 	# TODO: placeholders from the template, uncomment once the scripts exist
 	# mkdir -p analysis/...
-	# Rscript code/produce_some_plots.R
-	# go run code/do_text_analysis.go
+	# Rscript scripts/produce_some_plots.R
+	# go run scripts/do_text_analysis.go
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar
 	# to automate some less frequent operation that you might want to run only when strictly necessary
 	# (e.g., organize all produced data/analysis and run a notebook for an easier visual verification of obtained results)
-	# Rscript code/some_adhoc_script.R
+	# Rscript scripts/some_adhoc_script.R
