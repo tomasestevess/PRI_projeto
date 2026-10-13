@@ -1,0 +1,288 @@
+city,neighbourhood_cleansed,listings,median_price
+lisboa,A dos Cunhados e Maceira,154,130.33
+lisboa,Abrigada e Cabanas de Torres,12,206.0
+lisboa,Agualva e Mira-Sintra,28,61.455
+lisboa,Ajuda,244,115.345
+lisboa,Alcabideche,191,145.975
+lisboa,Alcntara,285,124.0
+lisboa,Alcoentre,1,
+lisboa,Aldeia Galega da Merceana e Aldeia Gavinha,7,227.5
+lisboa,Alenquer (Santo Estvo e Triana),43,160.5
+lisboa,Alfragide,13,124.86
+lisboa,"Algs, Linda-a-Velha e Cruz Quebrada-Dafundo",147,127.5
+lisboa,Alguber,1,910.0
+lisboa,Algueiro-Mem Martins,51,77.3
+lisboa,"Alhandra, So Joo dos Montes e Calhandriz",7,155.2
+lisboa,"Almargem do Bispo, Pro Pinheiro e Montelavar",29,113.0
+lisboa,Alvalade,258,111.75
+lisboa,Alverca do Ribatejo e Sobralinho,14,125.8
+lisboa,Areeiro,466,80.0
+lisboa,Arranh,5,159.76
+lisboa,Arroios,2154,102.71
+lisboa,Arruda dos Vinhos,4,77.5
+lisboa,Aveiras de Cima,1,81.25
+lisboa,Avenidas Novas,863,82.3
+lisboa,Azambuja,10,280.66499999999996
+lisboa,Azueira e Sobral da Abelheira,20,156.0
+lisboa,Barcarena,20,140.0
+lisboa,Beato,131,93.305
+lisboa,Belm,281,140.0
+lisboa,Benfica,81,112.89
+lisboa,Bucelas,9,232.33
+lisboa,Cacm e So Marcos,21,96.16499999999999
+lisboa,Cadaval e Pro Moniz,18,205.33
+lisboa,"Camarate, Unhos e Apelao",18,73.16
+lisboa,Campelos e Outeiro da Cabea,4,113.0
+lisboa,Campo de Ourique,473,121.25
+lisboa,Campolide,313,115.0
+lisboa,Carcavelos e Parede,445,137.0
+lisboa,Carnaxide e Queijas,25,151.0
+lisboa,Carnide,33,114.33
+lisboa,Carregado e Cadafais,16,156.75
+lisboa,Carvoeira,113,147.83499999999998
+lisboa,Carvoeira e Carmes,4,251.33
+lisboa,Casal de Cambra,9,45.65
+lisboa,Cascais e Estoril,1629,185.14999999999998
+lisboa,Colares,487,189.09
+lisboa,Dois Portos e Runa,18,225.0
+lisboa,Encarnao,55,187.0
+lisboa,Encosta do Sol,34,78.0
+lisboa,"Enxara do Bispo, Gradil e Vila Franca do Rosrio",22,122.0
+lisboa,Ericeira,736,161.5
+lisboa,Estrela,974,132.0
+lisboa,Falagueira-Venda Nova,26,58.5
+lisboa,Fanhes,3,81.055
+lisboa,Freiria,8,76.25
+lisboa,Igreja Nova e Cheleiros,18,166.57
+lisboa,Lamas e Cercal,23,94.5
+lisboa,Loures,29,94.0
+lisboa,Lourinh e Atalaia,364,151.0
+lisboa,Lousa,3,110.33
+lisboa,Lumiar,138,102.5
+lisboa,Mafra,66,163.0
+lisboa,Malveira e So Miguel de Alcaina,5,80.0
+lisboa,"Manique do Intendente, V.N.de S.Pedro e Maussa",3,143.0
+lisboa,Marvila,106,110.21000000000001
+lisboa,Massam e Monte Abrao,49,106.945
+lisboa,Maxial e Monte Redondo,4,164.45
+lisboa,Meca,2,165.67
+lisboa,Milharado,5,172.0
+lisboa,Mina de gua,58,90.86
+lisboa,Miragaia e Marteleira,9,62.77
+lisboa,Misericrdia,2588,151.83499999999998
+lisboa,Moita dos Ferreiros,5,79.88
+lisboa,Moscavide e Portela,111,99.86
+lisboa,Odivelas,78,119.91499999999999
+lisboa,"Oeiras e S.Julio da Barra, Pao de Arcos e Caxias",272,142.83499999999998
+lisboa,Olhalvo,2,205.5
+lisboa,Olivais,197,92.0
+lisboa,Ota,1,856.0
+lisboa,Painho e Figueiros,3,138.3
+lisboa,Parque das Naes,335,153.25
+lisboa,Penha de Frana,640,99.10499999999999
+lisboa,Peral,7,149.0
+lisboa,Ponte do Rol,10,110.25
+lisboa,Pontinha e Fames,33,47.93
+lisboa,Porto Salvo,12,109.0
+lisboa,Pvoa de Santa Iria e Forte da Casa,14,137.25
+lisboa,Pvoa de Santo Adrio e Olival de Basto,35,86.91499999999999
+lisboa,Queluz e Belas,61,112.25
+lisboa,Ramada e Caneas,23,57.0
+lisboa,Ramalhal,9,50.5
+lisboa,Reguengo Grande,28,160.0
+lisboa,Ribafria e Pereiro de Palhacana,12,104.67
+lisboa,Ribamar,46,214.745
+lisboa,Rio de Mouro,52,93.5
+lisboa,"S.Maria, S.Miguel, S.Martinho, S.Pedro Penaferrim",655,128.5
+lisboa,"S.Pedro e Santiago, S.Maria e S.Miguel, e Mataces",38,91.0
+lisboa,Sacavm e Prior Velho,60,98.0
+lisboa,Santa Brbara,35,243.75
+lisboa,Santa Clara,37,64.5
+lisboa,"Santa Iria de Azoia, So Joo da Talha e Bobadela",40,119.0
+lisboa,Santa Maria Maior,3572,152.13
+lisboa,Santiago dos Velhos,3,114.33
+lisboa,Santo Antnio,1486,148.0
+lisboa,Santo Antnio dos Cavaleiros e Frielas,37,106.0
+lisboa,Santo Anto e So Julio do Tojal,8,81.5
+lisboa,Santo Isidoro,244,141.875
+lisboa,Santo Quintino,14,123.735
+lisboa,Sapataria,9,144.0
+lisboa,Silveira,132,129.33
+lisboa,So Bartolomeu dos Galegos e Moledo,44,95.5
+lisboa,So Domingos de Benfica,159,122.0
+lisboa,So Domingos de Rana,94,115.6
+lisboa,So Joo das Lampas e Terrugem,185,144.5
+lisboa,So Pedro da Cadeira,44,132.70999999999998
+lisboa,So Vicente,1250,127.0
+lisboa,Sobral de Monte Agrao,2,468.0
+lisboa,Turcifal,7,152.875
+lisboa,Vale do Paraso,1,
+lisboa,Venda do Pinheiro e Santo Estvo das Gals,5,140.0
+lisboa,Venteira,83,68.5
+lisboa,Ventosa,11,164.4
+lisboa,Vermelha,6,164.25
+lisboa,Vialonga,4,246.835
+lisboa,Vila Franca de Xira,43,70.5
+lisboa,Vila Nova da Rainha,1,
+lisboa,Vila Verde dos Francos,16,142.5
+lisboa,Vilar,7,124.0
+lisboa,Vimeiro,9,109.2
+lisboa,guas Livres,65,83.0
+porto,"AVer-o-Mar, Amorim e Terroso",71,125.0
+porto,Agrela,2,138.0
+porto,Aguiar de Sousa,10,131.5
+porto,Aguçadoura e Navais,17,149.0
+porto,"Aldoar, Foz do Douro e Nevogilde",275,144.5
+porto,Alfena,9,142.14
+porto,Alvarelhos e Guidões,4,188.375
+porto,Alvarenga,30,150.5
+porto,Anta e Guetim,20,124.5
+porto,Arcozelo,82,141.0
+porto,"Areias, Sequeiró, Lama e Palmeira",7,178.5
+porto,Argoncilhe,1,308.2
+porto,Arouca e Burgo,47,105.5
+porto,Arrifana,1,75.0
+porto,Arões,15,141.0
+porto,Aveleda,8,69.0
+porto,Aves,1,145.0
+porto,Avintes,8,119.25
+porto,Azurara,34,145.5
+porto,Baguim do Monte (Rio Tinto),1,225.0
+porto,"Bagunte, Ferreiró, Outeiro Maior e Parada",8,263.0
+porto,Balazar,3,354.0
+porto,Baltar,1,174.0
+porto,Bonfim,1549,105.0
+porto,Bougado (São Martinho e Santiago),9,77.0
+porto,Cabreiros e Albergaria da Serra,6,159.0
+porto,Caldas de São Jorge e de Pigeiros,5,136.94
+porto,Campanhã,261,105.75
+porto,Campo e Sobrado,4,113.0
+porto,"Canedo, Vale e Vila Maior",14,188.44
+porto,Canelas,2,29.67
+porto,Canelas e Espiunca,11,169.04500000000002
+porto,Canidelo,160,176.0
+porto,Carregosa,3,133.89
+porto,Carreira e Refojos de Riba de Ave,2,122.25
+porto,Castêlo da Maia,13,82.08500000000001
+porto,"Cedofeita, Ildefonso, Sé, Miragaia, Nicolau, Vitória",7706,118.68
+porto,Cepelos,6,168.25
+porto,Cesar,4,97.5
+porto,Cete,10,108.7
+porto,Chave,4,171.5
+porto,Cidade da Maia,33,106.5
+porto,Coronado (São Romão e São Mamede),4,73.9
+porto,Covelas,2,203.0
+porto,Covelo de Paivó e Janarde,3,160.0
+porto,Cristelo,2,495.205
+porto,"Custóias, Leça do Balio e Guifões",25,103.66499999999999
+porto,Ermesinde,11,88.24000000000001
+porto,Escapães,2,498.4
+porto,Escariz,3,199.75
+porto,Espinho,131,119.0
+porto,Estela,2,380.25
+porto,Fermedo,3,513.6
+porto,Fiães,3,67.0
+porto,Folgosa,1,365.5
+porto,Fornelo e Vairão,8,163.0
+porto,Fornos,1,1.88
+porto,Foz do Sousa e Covelo,24,182.5
+porto,Fânzeres e São Pedro da Cova,12,78.5
+porto,Gandra,1,514.0
+porto,Gião,2,338.74
+porto,"Gondomar (São Cosme), Valbom e Jovim",47,148.75
+porto,Grijó e Sermonde,11,107.5
+porto,Guilhabreu,2,948.0
+porto,Gulpilhares e Valadares,58,134.67
+porto,Junqueira,5,228.33
+porto,Labruge,30,114.5
+porto,Laundos,7,302.67
+porto,"Lobão, Gião, Louredo e Guisande",12,92.875
+porto,Lomba,10,212.5
+porto,Lordelo,1,227.33
+porto,Lordelo do Ouro e Massarelos,588,116.16499999999999
+porto,Louredo,7,146.25
+porto,Loureiro,2,52.0
+porto,Lourosa,1,280.0
+porto,Macieira da Maia,17,55.0
+porto,Macieira de Cambra,10,103.0
+porto,Macieira de Sarnes,2,155.0
+porto,Madalena,55,142.0
+porto,Mafamude e Vilar do Paraíso,306,86.0
+porto,Malta e Canidelo,1,540.0
+porto,Mansores,6,180.0
+porto,Matosinhos e Leça da Palmeira,472,132.0
+porto,Melres e Medas,25,200.0
+porto,Milheirós de Poiares,2,727.5
+porto,Mindelo,31,132.5
+porto,Moldes,6,123.75
+porto,Monte Córdova,12,192.43
+porto,Moreira,44,86.0
+porto,Mozelos,2,92.0
+porto,Muro,5,205.5
+porto,Negrelos (São Tomé),1,799.0
+porto,Nogueira da Regedoura,3,168.8
+porto,Nogueira do Cravo e Pindelo,5,134.0
+porto,Nogueira e Silva Escura,13,83.0
+porto,"O. Azeméis, Riba-Ul, Ul, Macinhata da Seixa, Madail",16,66.19
+porto,Oliveira do Douro,55,147.34
+porto,Ossela,3,120.0
+porto,Parada de Todeia,16,147.5
+porto,Paramos,2,292.51
+porto,Paranhos,519,86.0
+porto,Paredes,20,98.6
+porto,Paços de Brandão,3,69.0
+porto,Pedroso e Seixezelo,10,211.58499999999998
+porto,Pedrouços,12,112.0
+porto,"Perafita, Lavra e Santa Cruz do Bispo",71,137.0
+porto,"Pinheiro da Bemposta, Travanca e Palmaz",9,23.0
+porto,"Póvoa de Varzim, Beiriz e Argivai",226,120.0
+porto,Ramalde,160,102.735
+porto,Rates,2,228.33
+porto,Rebordosa,7,167.0
+porto,Reguenga,1,117.5
+porto,Retorta e Tougues,6,65.75
+porto,Rio Mau e Arcos,9,130.065
+porto,Rio Meão,1,
+porto,Rio Tinto,42,102.0
+porto,Roge,13,98.0
+porto,Romariz,10,80.0
+porto,Roriz,1,287.0
+porto,Rossas,4,314.0
+porto,"Sandim, Olival, Lever e Crestuma",28,174.0
+porto,Sanguedo,2,160.535
+porto,Santa Eulália,8,200.0
+porto,"Santa Maria da Feira, Travanca, Sanfins e Espargo",22,100.0
+porto,Santa Marinha e São Pedro da Afurada,807,126.3
+porto,Serzedo e Perosinho,7,117.75
+porto,Silvalde,18,86.5
+porto,Sobreira,4,158.39499999999998
+porto,Sobrosa,1,245.0
+porto,"St. Tirso, Couto (S. Cristina e S. Miguel) e Burgães",12,112.67
+porto,São Félix da Marinha,49,138.25
+porto,São João da Madeira,48,71.0
+porto,São Mamede de Infesta e Senhora da Hora,128,94.0
+porto,São Martinho da Gândara,3,208.75
+porto,São Miguel do Mato,6,223.53
+porto,São Pedro Fins,1,50.33
+porto,São Pedro de Castelões,14,189.54500000000002
+porto,São Roque,1,171.5
+porto,Touguinha e Touguinhó,13,70.8
+porto,Tropeço,2,249.6
+porto,Urrô,12,126.0
+porto,Valongo,13,143.0
+porto,Vandoma,5,370.5
+porto,Vila Chã,28,170.0
+porto,"Vila Chã, Codal e Vila Cova de Perrinho",6,165.0
+porto,Vila Nova da Telha,5,216.0
+porto,Vila Nova do Campo,13,194.0
+porto,Vila de Cucujães,8,83.0
+porto,Vila do Conde,218,110.05
+porto,Vilar de Andorinho,15,109.0
+porto,Vilar de Pinheiro,7,143.0
+porto,Vilar e Mosteiró,7,120.0
+porto,Vilarinho,3,223.33
+porto,Vilela,9,148.0
+porto,Várzea,1,183.0
+porto,Água Longa,1,433.33
+porto,Águas Santas,5,115.0
+porto,Árvore,34,126.875

@@ -1,0 +1,3 @@
+city,reviews,null_comments,empty_reviews,words,characters,words_per_review,listings,listings_with_reviews,listings_without_reviews,sample_size
+lisboa,1886932,140,140,84120401,487749928,44.58051535508434,24876,21794,3082,37738
+porto,1131143,69,69,45715048,265820336,40.41491482509285,15278,13683,1595,22623

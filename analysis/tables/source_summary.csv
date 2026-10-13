@@ -1,0 +1,8 @@
+source,city,records,fields,file_mb,identifier
+Airbnb listings,lisboa,24876,90.0,13.61,id
+Airbnb reviews,lisboa,1886932,6.0,239.66,"listing_id, id"
+Airbnb listings,porto,15278,90.0,9.02,id
+Airbnb reviews,porto,1131143,6.0,137.2,"listing_id, id"
+OpenStreetMap POIs,lisboa,45150,,13.44,"type, id"
+OpenStreetMap POIs,porto,38411,,11.52,"type, id"
+Wikipedia articles,all,787,7.0,3.06,qid

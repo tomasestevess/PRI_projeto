@@ -1,0 +1,13 @@
+city,category,pois,total,named,with_wikidata,with_wikipedia,without_coordinates
+lisboa,food and drink,9222,45150,24625,757,395,0
+lisboa,leisure,672,45150,24625,757,395,0
+lisboa,public parking,19031,45150,24625,757,395,0
+lisboa,shops,1873,45150,24625,757,395,0
+lisboa,tourism and heritage,1866,45150,24625,757,395,0
+lisboa,transport,12486,45150,24625,757,395,0
+porto,food and drink,7083,38411,25005,441,257,0
+porto,leisure,679,38411,25005,441,257,0
+porto,public parking,12323,38411,25005,441,257,0
+porto,shops,1798,38411,25005,441,257,0
+porto,tourism and heritage,1538,38411,25005,441,257,0
+porto,transport,14990,38411,25005,441,257,0

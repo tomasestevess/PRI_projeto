@@ -4,7 +4,7 @@ SHELL := bash
 RAW      := data/raw
 UA       := FEUP-PRI-student-project/0.1
 DATE     := 2026-06-23
-PYTHON   := $(shell python3 --version >/dev/null 2>&1 && echo python3 || echo python)
+PYTHON   := $(if $(wildcard .venv/bin/python),.venv/bin/python,$(shell python3 --version >/dev/null 2>&1 && echo python3 || echo python))
 CITIES   := porto lisboa
 AIRBNB_porto  := portugal/norte/porto
 AIRBNB_lisboa := portugal/lisbon/lisbon
@@ -68,13 +68,9 @@ process:
 	# $(PYTHON) scripts/process_data3.py
 
 analyze:
-	# This target is recommended to isolate all data analysis scripts.
-	# Once again, it is recommended to separate different types of analysis between scripts,
-	# which may span several languages. Diversity is key here so data can be better understood.
-	# TODO: placeholders from the template, uncomment once the scripts exist
-	# mkdir -p analysis/...
-	# Rscript scripts/produce_some_plots.R
-	# go run scripts/do_text_analysis.go
+	find analysis/figures -type f -name '*.pdf' -delete
+	$(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace analysis/notebooks/01_eda.ipynb \
+		--ExecutePreprocessor.timeout=600
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

@@ -3,3 +3,9 @@
 
 # Python cache
 __pycache__/
+
+.venv
+.vscode
+.matplotlib
+
+/analysis/notebooks/.matplotlib

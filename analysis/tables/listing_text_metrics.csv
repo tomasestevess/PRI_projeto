@@ -1,0 +1,7 @@
+city,field,empty,empty_percentage,with_html_percentage,mean_words,median_words
+lisboa,name,0,0.0,0.0,5.77,6.0
+lisboa,description,613,2.46,52.62,59.13,66.0
+lisboa,neighborhood_overview,24876,100.0,0.0,0.0,0.0
+porto,name,0,0.0,0.0,5.77,6.0
+porto,description,309,2.02,51.47,58.91,64.0
+porto,neighborhood_overview,15278,100.0,0.0,0.0,0.0

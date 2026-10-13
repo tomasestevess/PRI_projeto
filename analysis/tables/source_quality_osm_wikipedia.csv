@@ -1,0 +1,4 @@
+source,city,records,duplicate_ids,missing_coordinates,missing_name,missing_wikidata
+OpenStreetMap,lisboa,45150,0,0.0,20525,44393
+OpenStreetMap,porto,38411,0,0.0,13406,37970
+Wikipedia,all,787,3,,0,0

@@ -1,0 +1,11 @@
+city,language,share,sample_size
+lisboa,en,0.607,6000
+lisboa,fr,0.1642,6000
+lisboa,unknown,0.1105,6000
+lisboa,pt,0.0638,6000
+lisboa,es,0.0545,6000
+porto,en,0.5308,6000
+porto,fr,0.1618,6000
+porto,unknown,0.1245,6000
+porto,es,0.0927,6000
+porto,pt,0.0902,6000
