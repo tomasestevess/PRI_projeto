@@ -1,0 +1,5 @@
+city,field,empty_count,empty_pct,median_words,p95_words
+lisboa,name,0,0.0,6.0,9.0
+lisboa,description,613,2.46,66.0,87.0
+porto,name,0,0.0,6.0,9.0
+porto,description,309,2.02,64.0,86.0

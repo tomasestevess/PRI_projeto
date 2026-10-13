@@ -1,2 +1,2 @@
-articles,languages,articles_with_multiple_pois,articles_without_poi,empty_articles,median_words,max_words
-787,2,35,0,0,353.0,9162
+articles,fields,languages,duplicate_qids,missing_qids,missing_titles,empty_articles,articles_without_poi,articles_with_multiple_pois,median_words,p95_words
+787,7,2,3,0,0,0,0,35,353.0,1999.3999999999999
