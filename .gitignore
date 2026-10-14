@@ -1,5 +1,6 @@
 # Data files (500+ MB, too large for GitHub)
 /data/raw/*
+/data/processed/*
 
 # Python cache
 __pycache__/
