@@ -13,11 +13,12 @@ It combines the Inside Airbnb listings and reviews with OpenStreetMap points of 
 | Tomás Esteves | 202205045 | up202205045@up.pt |
 
 ## Setup
-Requires make, bash, curl and python 3.9+. On Windows, install make with `winget install ezwinports.make` and run it from Git Bash.
+Requires make, bash, curl and python 3.12+. On Windows, install make with `winget install ezwinports.make` and run it from Git Bash.
 
 ```
-.venv/bin/python -m pip install -r scripts/requirements.txt
-make collect
+python -m venv .venv
+.venv/bin/python -m pip install -r scripts/requirements.txt   # Windows: .venv/Scripts/python
+make            # collect, process and analyze
 ```
 
 **make collect**: downloads the raw data into data/raw/. It takes about 20 minutes, almost all of it fetching Wikipedia. If it is interrupted, run it again and it resumes.
@@ -30,8 +31,8 @@ To run the complete exploratory analysis and regenerate the CSV tables and PDF f
 make analyze
 ```
 
-The analysis notebook is executed with `jupyter nbconvert`; the `Makefile` uses
-`.venv/bin/python` automatically when that environment exists.
+The two analysis notebooks are executed with `jupyter nbconvert`; the `Makefile` uses
+the `.venv` Python automatically when that environment exists.
 
 ## Structure
 ```

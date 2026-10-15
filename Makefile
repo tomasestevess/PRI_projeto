@@ -1,10 +1,12 @@
 SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
+# A target whose recipe fails is deleted, so a half-written file is not taken as done
+.DELETE_ON_ERROR:
 
 RAW      := data/raw
 UA       := FEUP-PRI-student-project/0.1
 DATE     := 2026-06-23
-PYTHON   := $(if $(wildcard .venv/bin/python),.venv/bin/python,$(shell python3 --version >/dev/null 2>&1 && echo python3 || echo python))
+PYTHON   := $(or $(wildcard .venv/bin/python .venv/Scripts/python.exe),$(shell python3 --version >/dev/null 2>&1 && echo python3 || echo python))
 CITIES   := porto lisboa
 AIRBNB_porto  := portugal/norte/porto
 AIRBNB_lisboa := portugal/lisbon/lisbon
@@ -19,8 +21,9 @@ FILES  := $(foreach c,$(CITIES),$(addprefix $(RAW)/airbnb_$(c)/,listings.csv.gz 
 # clean is left out so existing downloads are kept; run `make clean all` for a fresh start
 all: collect process analyze
 
+# Removes the downloads, the processed data and the generated figures and tables (the notebooks recreate the folders)
 clean:
-	rm -rf data processed analysis
+	rm -rf data analysis/figures analysis/tables
 
 .PHONY: all clean collect process analyze adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
@@ -45,8 +48,10 @@ $(RAW)/airbnb_%/neighbourhoods.geojson:
 # Overpass is rate limited: run without -j
 $(RAW)/osm/pois_%.json: scripts/osm_query.overpass.in
 	mkdir -p $(@D)
-	sed 's/@BBOX@/$(BBOX_$*)/' $< | curl -sSf -m 600 --retry 5 --retry-delay 30 -A "$(UA)" --data-urlencode data@-		https://overpass-api.de/api/interpreter -o $@.part
-	grep -q '"elements"' $@.part && ! grep -q 'runtime error' $@.part 		|| { rm -f $@.part; echo "Overpass returned no data; retry later" >&2; exit 1; }
+	sed 's/@BBOX@/$(BBOX_$*)/' $< | curl -sSf -m 600 --retry 5 --retry-delay 30 -A "$(UA)" --data-urlencode data@- \
+		https://overpass-api.de/api/interpreter -o $@.part
+	grep -q '"elements"' $@.part && ! grep -q 'runtime error' $@.part \
+		|| { rm -f $@.part; echo "Overpass returned no data; retry later" >&2; exit 1; }
 	mv $@.part $@
 	sleep 5
 
@@ -62,10 +67,10 @@ data/processed/documents.jsonl: data_processing.py $(FILES)
 
 # 01 characterizes the raw data, 02 the processed collection; together they produce every statistic in the report
 analyze: data/processed/documents.jsonl
-	find analysis/figures -type f \( -name '*.pdf' -o -name '*.png' \) -delete
+	rm -rf analysis/figures
 	for nb in 01_eda 02_processed_eda; do \
 		SNAPSHOT_DATE=$(DATE) $(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace analysis/notebooks/$$nb.ipynb \
-			--ExecutePreprocessor.timeout=1800; \
+			--ExecutePreprocessor.timeout=1800 || exit 1; \
 	done
 
 adhoc:

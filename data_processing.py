@@ -53,12 +53,10 @@ def load_and_combine(filename):
     """Lê um ficheiro específico de ambas as cidades e junta-os num só DataFrame."""
     dfs = []
     for city in CITIES:
-        path = RAW_DIR / f"airbnb_{city}" / filename
-        if path.exists():
-            df = pd.read_csv(path, compression='gzip', low_memory=False)
-            df['city'] = city
-            dfs.append(df)
-    return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+        df = pd.read_csv(RAW_DIR / f"airbnb_{city}" / filename, compression='gzip', low_memory=False)
+        df['city'] = city
+        dfs.append(df)
+    return pd.concat(dfs, ignore_index=True)
 
 def clean_html(series):
     """Remove tags (<br />) e entidades HTML (&amp;) e normaliza os espaços; texto vazio passa a nulo."""
@@ -107,7 +105,7 @@ def process_listings(df, snapshot):
     colunas_lixo = [
         'neighbourhood', 'instant_bookable', 'host_acceptance_rate',
         'host_response_rate', 'host_response_time', 'host_since', 'host_total_listings_count',
-        'host_verifications', 'host_since', 'host_neighbourhood', 'host_thumbnail_url',
+        'host_verifications', 'host_neighbourhood', 'host_thumbnail_url',
         'neighborhood_overview', 'calendar_updated'
     ]
 

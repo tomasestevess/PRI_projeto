@@ -71,7 +71,9 @@ def fetch_article(lang, title):
         "action": "query", "prop": "extracts|pageprops|info", "explaintext": 1,
         "redirects": 1, "titles": title, "formatversion": 2,  # redirects: otherwise the text is empty
     })
-    page = data["query"]["pages"][0] if data else {"missing": True}
+    if data is None:  # stop instead of losing the article; articles.jsonl stays .part, so a rerun resumes
+        raise SystemExit(f"Wikipedia API did not answer for {lang}:{title}; run again to resume")
+    page = data["query"]["pages"][0]
     if page.get("missing") or page.get("invalid") or not page.get("extract"):
         return None
     return {
@@ -94,7 +96,8 @@ def main():
         out.replace(part)
 
     by_qid, by_tag = load_pois(raw / "osm")
-    jobs = [(*tag.split(":", 1), pois) for tag, pois in by_tag.items()] + wikidata_jobs(by_qid)
+    tag_jobs = [(*tag.split(":", 1), pois) for tag, pois in by_tag.items()]
+    jobs = [job for job in tag_jobs if job[0] in LANGS] + wikidata_jobs(by_qid)  # other languages would never answer
 
     done = {(a["lang"], a["title"]) for a in read_jsonl(part)} if part.exists() else set()
     todo = [job for job in jobs if job[:2] not in done]
