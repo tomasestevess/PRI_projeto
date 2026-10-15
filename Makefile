@@ -60,10 +60,13 @@ process: data/processed/documents.jsonl
 data/processed/documents.jsonl: data_processing.py $(FILES)
 	$(PYTHON) data_processing.py --snapshot $(DATE)
 
-analyze:
-	find analysis/figures -type f -name '*.pdf' -delete
-	$(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace analysis/notebooks/01_eda.ipynb \
-		--ExecutePreprocessor.timeout=600
+# 01 characterizes the raw data, 02 the processed collection; together they produce every statistic in the report
+analyze: data/processed/documents.jsonl
+	find analysis/figures -type f \( -name '*.pdf' -o -name '*.png' \) -delete
+	for nb in 01_eda 02_processed_eda; do \
+		SNAPSHOT_DATE=$(DATE) $(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace analysis/notebooks/$$nb.ipynb \
+			--ExecutePreprocessor.timeout=1800; \
+	done
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

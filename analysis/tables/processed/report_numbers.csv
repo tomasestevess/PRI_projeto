@@ -1,0 +1,99 @@
+metric,value
+documents,30590
+documents_lisboa,18872
+documents_porto,11718
+reviews,2403239
+listing_poi_links,897237
+named_pois,49615
+linked_pois,24908
+pois_with_article,828
+articles_linked_to_pois,778
+listings_kept_pct,76.2
+reviews_kept_pct,79.6
+documents_gb,2.67
+room_type_pct_Entire home/apt,80.6
+room_type_pct_Hotel room,0.3
+room_type_pct_Private room,18.4
+room_type_pct_Shared room,0.7
+price_median_lisboa,136.0
+price_p95_lisboa,407
+price_median_entire_home_lisboa,156.0
+price_median_private_room_lisboa,67.0
+rating_median_lisboa,4.77
+price_median_porto,116.78
+price_p95_porto,323
+price_median_entire_home_porto,124.0
+price_median_private_room_porto,68.5
+rating_median_porto,4.81
+prices_above_1000,167
+rating_below_4_pct,3.0
+rating_at_least_4_8_pct,48.6
+reviews_per_listing_median,34.0
+reviews_per_listing_p95,313.0
+reviews_per_listing_max,1272
+listings_without_reviews,360
+top_10pct_listings_share_of_reviews_pct,43.9
+top_neighbourhood_lisboa,Santa Maria Maior
+top_neighbourhood_share_pct_lisboa,15.6
+top_neighbourhood_porto,"Cedofeita, Ildefonso, Sé, Miragaia, Nicolau, Vitória"
+top_neighbourhood_share_pct_porto,51.3
+reviews_2019,194539
+reviews_2020,61860
+peak_year,2025
+reviews_peak_year,436521
+pois_per_listing_median,28.0
+listings_without_pois,578
+listings_with_pois,30012
+nearest_food and drink_median_m,43.0
+with_food and drink_within_500m_pct,94.9
+nearest_transport_median_m,94.0
+with_transport_within_500m_pct,96.1
+nearest_tourism and heritage_median_m,102.0
+with_tourism and heritage_within_500m_pct,84.6
+nearest_shops_median_m,108.0
+with_shops_within_500m_pct,90.3
+nearest_public parking_median_m,201.0
+with_public parking_within_500m_pct,70.7
+nearest_leisure_median_m,263.0
+with_leisure_within_500m_pct,73.6
+listings_with_article_poi_pct,79.5
+article_pois_per_listing_median,5.0
+corr_price_accommodates_lisboa,0.7
+corr_price_bedrooms_lisboa,0.6
+corr_price_rating_lisboa,0.23
+corr_price_reviews_lisboa,0.08
+corr_pois_article_pois_lisboa,0.97
+corr_pois_reviews_lisboa,0.29
+corr_pois_bedrooms_lisboa,-0.13
+corr_price_accommodates_porto,0.61
+corr_price_bedrooms_porto,0.59
+corr_price_rating_porto,0.18
+corr_price_reviews_porto,-0.01
+corr_pois_article_pois_porto,0.95
+corr_pois_reviews_porto,0.26
+corr_pois_bedrooms_porto,-0.25
+rating_median_superhost,4.87
+rating_median_not_superhost,4.68
+review_words_total_millions,116
+review_words_median,37.0
+review_words_p95,129.0
+name_words_median,6.0
+description_words_median,67.0
+article_words_median,315.0
+article_words_max,9084
+articles_portuguese,766
+articles_english,16
+review_languages,85
+review_lang_pct_en,57.3
+review_lang_pct_fr,15.5
+review_lang_pct_pt,7.7
+review_lang_pct_es,7.6
+review_lang_pct_de,5.5
+amenities_per_listing_median,35.0
+distinct_amenities,4902
+reviews_mentioning_quiet_pct,5.7
+reviews_mentioning_noise or noisy_pct,3.6
+reviews_mentioning_metro_pct,5.2
+reviews_mentioning_check-in_pct,7.4
+reviews_mentioning_elevator or lift_pct,1.3
+reviews_mentioning_dog_pct,0.3

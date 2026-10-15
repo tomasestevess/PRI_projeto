@@ -1,0 +1,8 @@
+,price,accommodates,bedrooms,number_of_reviews,review_scores_rating,nearby_pois,nearby_article_pois
+price,1.0,0.61,0.59,-0.01,0.18,0.07,0.07
+accommodates,0.61,1.0,0.78,0.01,0.03,-0.16,-0.14
+bedrooms,0.59,0.78,1.0,-0.0,0.03,-0.25,-0.23
+number_of_reviews,-0.01,0.01,-0.0,1.0,-0.08,0.26,0.27
+review_scores_rating,0.18,0.03,0.03,-0.08,1.0,-0.05,-0.04
+nearby_pois,0.07,-0.16,-0.25,0.26,-0.05,1.0,0.95
+nearby_article_pois,0.07,-0.14,-0.23,0.27,-0.04,0.95,1.0

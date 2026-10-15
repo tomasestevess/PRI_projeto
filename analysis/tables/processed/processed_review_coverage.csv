@@ -1,3 +1,0 @@
-city,processed_listings,listings_with_reviews,listings_without_reviews,review_listing_ids_not_in_listings,median_reviews_per_reviewed_listing,p95_reviews_per_reviewed_listing,max_reviews_per_listing
-lisboa,24876,21766,3110,28,35.0,353.0,1931
-porto,15278,13676,1602,7,35.0,322.0,1137
