@@ -41,7 +41,6 @@ Wikipedia articles,all,articles,782.0
 Wikipedia articles,all,with_final_sections,745.0
 Wikipedia articles,all,under_100_words,122.0
 Airbnb listings,total,listings,40154.0
-Airbnb listings,total,fields,180.0
 Airbnb listings,total,empty_fields,24.0
 Airbnb listings,total,duplicate_ids,0.0
 Airbnb listings,total,missing_price,3832.0
