@@ -54,18 +54,11 @@ $(RAW)/osm/pois_%.json: scripts/osm_query.overpass.in
 $(RAW)/wikipedia/articles.jsonl: $(foreach c,$(CITIES),$(RAW)/osm/pois_$(c).json)
 	$(PYTHON) -u scripts/fetch_wikipedia.py --raw $(RAW)
 
-process:
-	# This target is reserved for data processing, which typically includes
-	# cleaning and refinement.
-	# As best practice, have multiple scripts to perform different (sub)steps
-	# You may even opt for several targets for bigger granularity
-	# (e.g., a process_cleaning and a process_refinement target)
-	# Moreover, ensure that data also goes to a known location for easier analysis
-	# TODO: placeholders from the template, uncomment once the scripts exist
-	# mkdir -p processed/...
-	# Rscript scripts/process_data1.R
-	# sh scripts/process_data2.sh
-	# $(PYTHON) scripts/process_data3.py
+# Cleans the raw data and builds data/processed/documents.jsonl (listings with nested reviews and POIs)
+process: data/processed/documents.jsonl
+
+data/processed/documents.jsonl: data_processing.py $(FILES)
+	$(PYTHON) data_processing.py --snapshot $(DATE)
 
 analyze:
 	find analysis/figures -type f -name '*.pdf' -delete
