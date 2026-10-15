@@ -1,0 +1,13 @@
+city,variable,count,median_km,p95_km,max_km
+lisboa,nearest_food_and_drink_distance_km,24876,0.049,0.63,3.861
+lisboa,nearest_tourism_and_heritage_distance_km,24876,0.121,1.28225,6.524
+lisboa,nearest_transport_distance_km,24876,0.102,0.49324999999999997,8.422
+lisboa,nearest_shops_distance_km,24876,0.106,1.2782499999999999,6.587
+lisboa,nearest_leisure_distance_km,24876,0.319,1.499,9.529
+lisboa,nearest_public_parking_distance_km,24876,0.096,0.558,7.659
+porto,nearest_food_and_drink_distance_km,15278,0.046,0.38314999999999966,4.251
+porto,nearest_tourism_and_heritage_distance_km,15278,0.122,1.0651499999999996,4.161
+porto,nearest_transport_distance_km,15278,0.09,0.26314999999999966,6.549
+porto,nearest_shops_distance_km,15278,0.129,0.696,8.609
+porto,nearest_leisure_distance_km,15278,0.347,1.011,5.888
+porto,nearest_public_parking_distance_km,15278,0.084,0.397,5.156
