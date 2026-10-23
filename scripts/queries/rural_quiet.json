@@ -1,0 +1,16 @@
+{
+  "query": "sossegado tranquilo calmo quiet peaceful calm",
+  "params": {
+    "defType": "edismax",
+    "qf": "name^3 description host_about"
+  },
+  "filter": [
+    "doc_type:listing",
+    "poi_count_500m:[0 TO 20]",
+    "food_count_500m:[1 TO *]",
+    "review_scores_rating:[4.8 TO *]",
+    "number_of_reviews:[5 TO *]"
+  ],
+  "fields": "id,name,city,neighbourhood_cleansed,location,price,review_scores_rating,number_of_reviews,poi_count_500m,food_count_500m,listing_url,score",
+  "limit": 10
+}

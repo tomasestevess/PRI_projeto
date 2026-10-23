@@ -1,0 +1,15 @@
+{
+  "query": "apartamento",
+  "params": {
+    "defType": "edismax",
+    "qf": "name^3 description",
+    "pt": "41.1406,-8.6139"
+  },
+  "filter": [
+    "doc_type:listing",
+    "city:porto",
+    "{!geofilt sfield=location pt=$pt d=0.5}"
+  ],
+  "fields": "id,name,price,room_type,property_type,location,listing_url,dist:geodist(location,41.1406,-8.6139),score",
+  "limit": 10
+}
