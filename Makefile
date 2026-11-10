@@ -25,7 +25,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down index adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -65,7 +65,7 @@ process: data/processed/documents.jsonl
 data/processed/documents.jsonl: data_processing.py $(FILES)
 	$(PYTHON) data_processing.py --snapshot $(DATE)
 
-# Translates the reviews to English (data/processed/reviews_en.jsonl). Takes days on a CPU and resumes when rerun.
+# Translates the reviews to English (data/processed/reviews_en.jsonl). Takes about 10 hours on a CPU and resumes when rerun.
 # Not a file target: .DELETE_ON_ERROR would discard what was translated if it were interrupted.
 translate: data/processed/documents.jsonl
 	$(PYTHON) -u scripts/translate_reviews.py
@@ -77,6 +77,16 @@ analyze: data/processed/documents.jsonl
 		SNAPSHOT_DATE=$(DATE) $(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace analysis/notebooks/$$nb.ipynb \
 			--ExecutePreprocessor.timeout=1800 || exit 1; \
 	done
+
+solr-up:
+	docker compose up -d --wait
+
+solr-down:
+	docker compose down
+
+# Defines the schema and reindexes everything
+index: solr-up data/processed/documents.jsonl
+	$(PYTHON) -u scripts/solr_index.py --reset $(ARGS)
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

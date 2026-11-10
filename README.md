@@ -13,7 +13,7 @@ It combines the Inside Airbnb listings and reviews with OpenStreetMap points of 
 | Tomás Esteves | 202205045 | up202205045@up.pt |
 
 ## Setup
-Requires make, bash, curl and python 3.12+. On Windows, install make with `winget install ezwinports.make` and run it from Git Bash.
+Requires make, bash, curl, Docker and python 3.12+. On Windows, install make with `winget install ezwinports.make` and run it from Git Bash.
 
 ```
 python -m venv .venv
@@ -25,7 +25,11 @@ make            # collect, process and analyze
 
 **make process**: cleans the raw data and builds the document collection in data/processed/ (see [Processed data](#processed-data)).
 
-**make translate**: translates the reviews in French, Spanish, Portuguese, German, Italian and Dutch to English, locally on the CPU. It takes days. If it is interrupted, run it again and it resumes. The Solr indexing skips reviews that have no translation yet.
+**make translate**: translates the reviews in French, Spanish, Portuguese, German, Italian and Dutch to English, locally on the CPU. It takes about 10 hours. If it is interrupted, run it again and it resumes. The Solr indexing skips reviews that have no translation yet.
+
+**make solr-up**: starts Solr in Docker and waits until the `airbnb` core answers. The admin interface is at http://localhost:8983. **make solr-down** stops it and keeps the index.
+
+**make index**: starts Solr if needed, defines the schema and reindexes everything (see [docs/schema.md](docs/schema.md)). For a quick test: `make index ARGS="--limit 500"`.
 
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 
@@ -43,6 +47,10 @@ scripts/osm_query.overpass.in   Overpass query, @BBOX@ is replaced by each city'
 scripts/fetch_wikipedia.py      fetches Wikipedia articles
 data_processing.py              cleans the raw data and builds the documents (make process)
 scripts/translate_reviews.py    translates the reviews to English (make translate)
+docker-compose.yml              Solr container (make solr-up, make solr-down)
+scripts/solr_index.py           defines the Solr schema and indexes the documents (make index)
+scripts/solr_analysis.py        Solr text analysis and synonyms
+docs/schema.md                  Solr schema and indexing decisions
 data/raw/                       raw data
 data/processed/                 processed data
 ```

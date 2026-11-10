@@ -1,7 +1,7 @@
 """Translates the non-English reviews to English, so that all reviews are searched through comments_en.
 
 Runs on the CPU with CTranslate2 and the Argos Translate models, downloaded to data/raw/models.
-Writes data/processed/reviews_en.jsonl, one {"id", "text"} per review. It takes days: if it is
+Writes data/processed/reviews_en.jsonl, one {"id", "text"} per review. It takes hours: if it is
 interrupted, run it again and it resumes.
 
 Usage: python scripts/translate_reviews.py [--langs fr pt] [--limit N]
@@ -23,6 +23,7 @@ REVIEWS = Path("data/processed/reviews_clean.csv")
 OUT = Path("data/processed/reviews_en.jsonl")
 MODELS = Path("data/raw/models")
 ARGOS = "https://argos-net.com/v1/translate-{}.argosmodel"
+UA = "FEUP-PRI-student-project/0.1"  # the server answers 403 to urllib's default User-Agent
 # es stays at 1.0: from 1.9 on it needs another tokenizer
 MODEL_VERSIONS = {"fr": "fr_en-1_9", "es": "es_en-1_0", "pt": "pt_en-1_9", "de": "de_en-1_3",
                   "it": "it_en-1_0", "nl": "nl_en-1_8"}
@@ -62,7 +63,9 @@ def model_dir(lang):
         MODELS.mkdir(parents=True, exist_ok=True)
         archive = MODELS / f"{lang}.zip"
         print(f"downloading the {lang} model", flush=True)
-        urllib.request.urlretrieve(ARGOS.format(MODEL_VERSIONS[lang]), archive)
+        request = urllib.request.Request(ARGOS.format(MODEL_VERSIONS[lang]), headers={"User-Agent": UA})
+        with urllib.request.urlopen(request) as response, open(archive, "wb") as f:
+            shutil.copyfileobj(response, f)
         tmp = MODELS / f"{lang}.tmp"
         with zipfile.ZipFile(archive) as z:
             z.extractall(tmp)

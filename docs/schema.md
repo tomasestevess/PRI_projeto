@@ -44,7 +44,8 @@ All 57 fields are stored and single-valued, except where noted. `id` is Solr's b
 | `name` | `text_multi` | |
 | `category`, `type` | `string` | |
 | `distance_m` | `pfloat` | Distance to the listing |
-| `wikipedia_title`, `wikipedia_text` | `text_multi` | |
+| `wikipedia_title` | `text_multi` | |
+| `wikipedia_text` | `text_multi` | Indexed but not stored |
 
 ## Text types
 
@@ -52,3 +53,14 @@ All 57 fields are stored and single-valued, except where noted. `id` is Solr's b
 |---|---|
 | `text_multi` | Standard tokenizer, lowercase, ASCII folding. No stemming. English and Portuguese synonyms at query time |
 | `text_en_fold` | Solr's `text_en` plus ASCII folding. English synonyms at query time |
+
+## Indexing
+
+`data/processed/documents.jsonl` has 2.7 GB. Its 30,590 listings and their children make about 3.3 million Solr documents.
+
+| Decision | Value | Reason |
+|---|---|---|
+| Batches | 200 listings per request (`--batch`) | The file is read line by line, so the collection is never all in memory |
+| Commits | One explicit commit at the end, soft commits disabled in `docker-compose.yml` | Nothing is searched during indexing, so opening searchers would only slow it down |
+| Heap | 4 GB (`SOLR_HEAP`) | Solr's default is 512 MB |
+| Wikipedia | Text kept on each POI child, indexed but not stored | The repeated text takes 1.22 GB of the file for 2.25 MB of distinct articles. Keeping it on the child lets a block join use it for ranking |

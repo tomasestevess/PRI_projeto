@@ -69,7 +69,8 @@ def define_schema(solr):
     def field(name, type_, **kw):
         extra = {"indexed": False, "docValues": False} if name in DISPLAY_ONLY else {}
         return {"name": name, "type": type_, "stored": True, **extra, **kw}
-    fields = [field(n, "text_multi") for n in TEXT]
+    # wikipedia_text repeats on every POI child near the article, so it is searchable but not stored
+    fields = [field(n, "text_multi", stored=n != "wikipedia_text") for n in TEXT]
     fields += [field(f"comments_{lang}", f"{t}_fold") for lang, t in REVIEW_LANGS.items()]
     fields += [field(n, "string") for n in STRINGS]
     fields += [field(n, "string", multiValued=True) for n in MULTI_STRINGS]
