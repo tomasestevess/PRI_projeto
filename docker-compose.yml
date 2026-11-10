@@ -1,0 +1,25 @@
+services:
+  solr:
+    # Nested documents need Solr 10 or later
+    image: solr:10.1
+    container_name: pri_solr
+    ports:
+      - "8983:8983"
+    environment:
+      # The default heap is 512m, too small for about 3.3 million documents
+      SOLR_HEAP: 4g
+      # No soft commits while indexing: solr_index.py commits once at the end
+      SOLR_OPTS: -Dsolr.autoSoftCommit.maxTime=-1
+    volumes:
+      - solr_data:/var/solr
+    command:
+      - solr-precreate
+      - airbnb
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/airbnb/admin/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+volumes:
+  solr_data:

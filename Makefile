@@ -25,7 +25,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process analyze adhoc
+.PHONY: all clean collect process translate analyze adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -64,6 +64,11 @@ process: data/processed/documents.jsonl
 
 data/processed/documents.jsonl: data_processing.py $(FILES)
 	$(PYTHON) data_processing.py --snapshot $(DATE)
+
+# Translates the reviews to English (data/processed/reviews_en.jsonl). Takes days on a CPU and resumes when rerun.
+# Not a file target: .DELETE_ON_ERROR would discard what was translated if it were interrupted.
+translate: data/processed/documents.jsonl
+	$(PYTHON) -u scripts/translate_reviews.py
 
 # 01 characterizes the raw data, 02 the processed collection; together they produce every statistic in the report
 analyze: data/processed/documents.jsonl

@@ -7,6 +7,7 @@ Usage: python scripts/solr_index.py [--solr http://localhost:8983/solr/airbnb] [
 import argparse
 import json
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -17,12 +18,13 @@ from scipy.spatial import cKDTree
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # data_processing.py sits at the repo root
 import data_processing as dp
 from solr_analysis import define_analysis
+from translate_reviews import load_translations
 
 DOCS = "data/processed/documents.jsonl"
 
-# Reviews in other languages are dropped; the text of each kept one goes to comments_<lang>, analysed per language
-REVIEW_LANGS = {"en": "text_en", "fr": "text_fr", "pt": "text_pt", "es": "text_es", "de": "text_de",
-                "it": "text_it", "nl": "text_nl"}
+# All reviews go to comments_en, the translated ones with the text from scripts/translate_reviews.py.
+# Reviews without a translation are dropped, which covers the languages that are not translated.
+REVIEW_LANGS = {"en": "text_en"}
 TEXT = ["name", "description", "host_about", "wikipedia_title", "wikipedia_text"]
 STRINGS = ["doc_type", "city", "neighbourhood_cleansed", "neighbourhood_group_cleansed", "property_type",
            "room_type", "bathrooms_text", "host_name", "host_location", "host_is_superhost",
@@ -121,6 +123,19 @@ def clean(doc):
     return doc
 
 
+def report(solr, start):
+    """Prints what the core actually holds per doc_type, the indexing time and the index size."""
+    def get(url):
+        return json.loads(urllib.request.urlopen(url, timeout=600).read())
+
+    root, core = solr.rstrip("/").rsplit("/", 1)
+    facets = get(f"{solr}/select?q=*:*&rows=0&facet=true&facet.field=doc_type")["facet_counts"]["facet_fields"]
+    counts = facets["doc_type"]
+    print("documents:", dict(zip(counts[::2], counts[1::2])))
+    index = get(f"{root}/admin/cores?action=STATUS&core={core}")["status"][core]["index"]
+    print(f"indexing time: {time.time() - start:.0f} s, index size: {index['size']}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--solr", default="http://localhost:8983/solr/airbnb")
@@ -131,17 +146,24 @@ def main():
 
     define_schema(args.solr)
     density = PoiDensity()
+    translations = load_translations()
+    print(f"{len(translations)} translated reviews")
     if args.reset:
         call(f"{args.solr}/update?commit=true", {"delete": {"query": "*:*"}})
+    start = time.time()
     batch, total = [], 0
     with open(DOCS, encoding="utf-8") as f:
         for line in f:
             listing = json.loads(line)
             density.add(listing)  # needs latitude and longitude, which clean() drops
             batch.append(clean(listing))
-            reviews = [r for r in batch[-1].get("reviews", []) if r.get("lang") in REVIEW_LANGS]
-            for r in reviews:
-                r[f"comments_{r['lang']}"] = r.pop("comments")
+            reviews = []
+            for r in batch[-1].get("reviews", []):
+                comments = r.pop("comments")
+                text = comments if r.get("lang") == "en" else translations.get(r["id"])
+                if text:
+                    r["comments_en"] = text
+                    reviews.append(r)
             batch[-1]["reviews"] = reviews
             for child in reviews + batch[-1].get("pois", []):
                 clean(child)
@@ -157,6 +179,7 @@ def main():
         total += len(batch)
     call(f"{args.solr}/update", {"commit": {}})
     print(f"\rindexed {total} listings, committed")
+    report(args.solr, start)
 
 
 if __name__ == "__main__":
