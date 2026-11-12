@@ -12,11 +12,13 @@ services:
       SOLR_OPTS: -Dsolr.autoSoftCommit.maxTime=-1
     volumes:
       - solr_data:/var/solr
+    # One core per setup (configs/setup1.json, configs/setup2.json)
     command:
-      - solr-precreate
-      - airbnb
+      - bash
+      - -c
+      - precreate-core airbnb_s1; exec solr-precreate airbnb_s2
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/airbnb/admin/ping"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8983/solr/airbnb_s1/admin/ping && curl -sf http://localhost:8983/solr/airbnb_s2/admin/ping"]
       interval: 5s
       timeout: 5s
       retries: 60

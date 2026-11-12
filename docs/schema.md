@@ -1,11 +1,11 @@
 # Solr schema
 
-Core: `airbnb`. Defined in `scripts/solr_index.py` and `scripts/solr_analysis.py`.
+Two cores, one per setup: `airbnb_s1` (listings only) and `airbnb_s2` (listings with reviews and POIs). The fields, types and query parameters are in `configs/setup1.json` and `configs/setup2.json`, applied by `scripts/solr_index.py` and `scripts/solr_analysis.py`. This page describes setup 2, which has every field; setup 1 has only the listing fields, with `text_simple` (standard tokenizer, lowercase, ASCII folding) for the three text fields. See [report_solr_schema.md](report_solr_schema.md) for the reasoning.
 
 Each listing is a parent document, with its reviews and POIs as nested child documents.
 `doc_type` tells them apart: `listing`, `review` or `poi`.
 
-All 57 fields are stored and single-valued, except where noted. `id` is Solr's built-in key.
+All 58 fields are stored and single-valued, except where noted. `id` is Solr's built-in key.
 
 ## Listing
 
@@ -13,7 +13,8 @@ All 57 fields are stored and single-valued, except where noted. `id` is Solr's b
 |---|---|---|
 | `doc_type` | `string` | Also on reviews and POIs |
 | `listing_id` | `plong` | |
-| `name`, `description`, `host_about` | `text_multi` | `name` is also on POIs |
+| `name`, `host_about` | `text_multi` | |
+| `description` | `text_en_fold` | 99 % of the descriptions are English |
 | `city`, `neighbourhood_cleansed`, `neighbourhood_group_cleansed` | `string` | |
 | `property_type`, `room_type` | `string` | |
 | `host_location`, `host_is_superhost`, `host_identity_verified`, `has_availability` | `string` | |
@@ -41,11 +42,11 @@ All 57 fields are stored and single-valued, except where noted. `id` is Solr's b
 
 | Field | Type | Notes |
 |---|---|---|
-| `name` | `text_multi` | |
+| `poi_name` | `text_multi` | Own field, so POI names do not enter the statistics of the listing `name` |
 | `category`, `type` | `string` | |
 | `distance_m` | `pfloat` | Distance to the listing |
 | `wikipedia_title` | `text_multi` | |
-| `wikipedia_text` | `text_multi` | Indexed but not stored |
+| `wikipedia_text` | `text_pt_fold` | 98 % of the articles are Portuguese. Indexed but not stored |
 
 ## Text types
 
@@ -53,6 +54,8 @@ All 57 fields are stored and single-valued, except where noted. `id` is Solr's b
 |---|---|
 | `text_multi` | Standard tokenizer, lowercase, ASCII folding. No stemming. English and Portuguese synonyms at query time |
 | `text_en_fold` | Solr's `text_en` plus ASCII folding. English synonyms at query time |
+| `text_pt_fold` | Solr's `text_pt` plus ASCII folding. Portuguese synonyms at query time |
+| `text_simple` | Setup 1 only: standard tokenizer, lowercase, ASCII folding |
 
 ## Indexing
 

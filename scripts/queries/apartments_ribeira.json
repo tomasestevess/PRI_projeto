@@ -1,8 +1,7 @@
 {
+  "description": "Apartments within 500 m of Ribeira (Porto): the name and description matter, the filter does the geography.",
   "query": "apartamento",
   "params": {
-    "defType": "edismax",
-    "qf": "name^3 description",
     "pt": "41.1406,-8.6139"
   },
   "filter": [

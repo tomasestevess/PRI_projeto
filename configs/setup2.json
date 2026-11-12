@@ -1,0 +1,149 @@
+{
+  "setup": "setup2",
+  "core": "airbnb_s2",
+  "description": "Listings with nested reviews (English, translated) and POIs, per-language analyzers, relevance boosts.",
+  "nested": {
+    "reviews": true,
+    "pois": true
+  },
+  "analysis": [
+    {
+      "name": "text_multi",
+      "kind": "multi",
+      "synonyms": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "name": "text_en_fold",
+      "kind": "derived",
+      "base": "text_en",
+      "synonyms": "en"
+    },
+    {
+      "name": "text_pt_fold",
+      "kind": "derived",
+      "base": "text_pt",
+      "synonyms": "pt"
+    }
+  ],
+  "synonyms": [
+    "en",
+    "pt"
+  ],
+  "schema": {
+    "text": {
+      "name": "text_multi",
+      "description": "text_en_fold",
+      "host_about": "text_multi",
+      "wikipedia_title": "text_multi",
+      "wikipedia_text": "text_pt_fold",
+      "poi_name": "text_multi"
+    },
+    "review_text": {
+      "en": {
+        "field": "comments_en",
+        "type": "text_en_fold"
+      }
+    },
+    "string": [
+      "doc_type",
+      "city",
+      "neighbourhood_cleansed",
+      "neighbourhood_group_cleansed",
+      "property_type",
+      "room_type",
+      "bathrooms_text",
+      "host_name",
+      "host_location",
+      "host_is_superhost",
+      "host_identity_verified",
+      "has_availability",
+      "listing_url",
+      "picture_url",
+      "lang",
+      "category",
+      "type",
+      "reviewer_name"
+    ],
+    "display_only": [
+      "bathrooms_text",
+      "host_name",
+      "listing_url",
+      "picture_url",
+      "reviewer_name"
+    ],
+    "multi_string": [
+      "amenities"
+    ],
+    "int": [
+      "accommodates",
+      "number_of_reviews",
+      "number_of_reviews_ltm",
+      "number_of_reviews_l30d",
+      "number_of_reviews_ly",
+      "availability_30",
+      "availability_60",
+      "availability_90",
+      "availability_365",
+      "availability_eoy",
+      "poi_count_500m",
+      "food_count_500m"
+    ],
+    "long": [
+      "listing_id"
+    ],
+    "float": [
+      "price",
+      "bathrooms",
+      "bedrooms",
+      "beds",
+      "minimum_nights",
+      "reviews_per_month",
+      "host_listings_count",
+      "review_scores_rating",
+      "review_scores_accuracy",
+      "review_scores_cleanliness",
+      "review_scores_checkin",
+      "review_scores_communication",
+      "review_scores_location",
+      "review_scores_value",
+      "distance_m"
+    ],
+    "date": [
+      "first_review",
+      "last_review",
+      "date"
+    ],
+    "location": "location",
+    "not_stored": [
+      "wikipedia_text"
+    ],
+    "review_translated": [
+      "fr",
+      "es",
+      "pt",
+      "de",
+      "it",
+      "nl"
+    ]
+  },
+  "query": {
+    "params": {
+      "defType": "lucene",
+      "q.op": "OR",
+      "q": "_query_:\"{!edismax qf=$qf pf=$pf ps=$ps tie=$tie mm=$mm boost=$boost v=$user_q}\" _query_:\"{!parent which=$parents score=avg v=$review_q}\"^0.5 _query_:\"{!parent which=$parents score=max v=$poi_q}\"^0.3",
+      "parents": "doc_type:listing",
+      "qf": "name^3 description^2 host_about^0.5",
+      "pf": "name^6 description^4",
+      "ps": 2,
+      "tie": 0.1,
+      "mm": "2<-1 5<50%",
+      "boost": "sum(1,product(0.1,def(review_scores_rating,3)),product(0.02,log(sum(1,def(number_of_reviews,0)))))",
+      "review_q": "{!edismax qf='comments_en' tie=0.1 mm='2<-1 5<50%' v=$user_q}",
+      "poi_q": "{!bool filter=doc_type:poi must=$poi_text}",
+      "poi_text": "{!edismax qf='poi_name^2 wikipedia_title^2 wikipedia_text' tie=0.1 v=$user_q}"
+    }
+  }
+}

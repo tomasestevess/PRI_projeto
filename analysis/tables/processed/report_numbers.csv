@@ -3,14 +3,14 @@ documents,30590
 documents_lisboa,18872
 documents_porto,11718
 reviews,2403239
-listing_poi_links,897237
-named_pois,49615
-linked_pois,24908
-pois_with_article,828
-articles_linked_to_pois,778
+listing_poi_links,899193
+named_pois,49640
+linked_pois,24918
+pois_with_article,831
+articles_linked_to_pois,780
 listings_kept_pct,76.2
 reviews_kept_pct,79.6
-documents_gb,2.67
+documents_gb,2.68
 room_type_pct_Entire home/apt,80.6
 room_type_pct_Hotel room,0.3
 room_type_pct_Private room,18.4
@@ -48,12 +48,12 @@ nearest_food and drink_median_m,43.0
 with_food and drink_within_500m_pct,94.9
 nearest_transport_median_m,94.0
 with_transport_within_500m_pct,96.1
-nearest_tourism and heritage_median_m,102.0
+nearest_tourism and heritage_median_m,101.0
 with_tourism and heritage_within_500m_pct,84.6
 nearest_shops_median_m,108.0
 with_shops_within_500m_pct,90.3
 nearest_public parking_median_m,201.0
-with_public parking_within_500m_pct,70.7
+with_public parking_within_500m_pct,70.9
 nearest_leisure_median_m,263.0
 with_leisure_within_500m_pct,73.6
 listings_with_article_poi_pct,79.5
@@ -79,9 +79,9 @@ review_words_median,37.0
 review_words_p95,129.0
 name_words_median,6.0
 description_words_median,67.0
-article_words_median,315.0
+article_words_median,312.5
 article_words_max,9084
-articles_portuguese,766
+articles_portuguese,772
 articles_english,16
 review_languages,85
 review_lang_pct_en,57.3

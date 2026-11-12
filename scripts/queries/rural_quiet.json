@@ -1,9 +1,6 @@
 {
+  "description": "Quiet places with few POIs nearby but at least one food place, well rated. Mixes English and Portuguese terms.",
   "query": "sossegado tranquilo calmo quiet peaceful calm",
-  "params": {
-    "defType": "edismax",
-    "qf": "name^3 description host_about"
-  },
   "filter": [
     "doc_type:listing",
     "poi_count_500m:[0 TO 20]",

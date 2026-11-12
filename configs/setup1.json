@@ -1,0 +1,99 @@
+{
+  "setup": "setup1",
+  "core": "airbnb_s1",
+  "description": "Baseline: one flat document per listing, simple analyzer, no reviews or POIs.",
+  "nested": {
+    "reviews": false,
+    "pois": false
+  },
+  "analysis": [
+    {
+      "name": "text_simple",
+      "kind": "simple"
+    }
+  ],
+  "synonyms": [],
+  "schema": {
+    "text": {
+      "name": "text_simple",
+      "description": "text_simple",
+      "host_about": "text_simple"
+    },
+    "review_text": {},
+    "string": [
+      "doc_type",
+      "city",
+      "neighbourhood_cleansed",
+      "neighbourhood_group_cleansed",
+      "property_type",
+      "room_type",
+      "bathrooms_text",
+      "host_name",
+      "host_location",
+      "host_is_superhost",
+      "host_identity_verified",
+      "has_availability",
+      "listing_url",
+      "picture_url"
+    ],
+    "display_only": [
+      "bathrooms_text",
+      "host_name",
+      "listing_url",
+      "picture_url"
+    ],
+    "multi_string": [
+      "amenities"
+    ],
+    "int": [
+      "accommodates",
+      "number_of_reviews",
+      "number_of_reviews_ltm",
+      "number_of_reviews_l30d",
+      "number_of_reviews_ly",
+      "availability_30",
+      "availability_60",
+      "availability_90",
+      "availability_365",
+      "availability_eoy",
+      "poi_count_500m",
+      "food_count_500m"
+    ],
+    "long": [
+      "listing_id"
+    ],
+    "float": [
+      "price",
+      "bathrooms",
+      "bedrooms",
+      "beds",
+      "minimum_nights",
+      "reviews_per_month",
+      "host_listings_count",
+      "review_scores_rating",
+      "review_scores_accuracy",
+      "review_scores_cleanliness",
+      "review_scores_checkin",
+      "review_scores_communication",
+      "review_scores_location",
+      "review_scores_value"
+    ],
+    "date": [
+      "first_review",
+      "last_review"
+    ],
+    "location": "location",
+    "not_stored": [],
+    "review_translated": []
+  },
+  "query": {
+    "params": {
+      "defType": "edismax",
+      "qf": "name^3 description^2 host_about^0.5",
+      "pf": "name^6 description^4",
+      "ps": 2,
+      "tie": 0.1,
+      "mm": "2<-1 5<50%"
+    }
+  }
+}
