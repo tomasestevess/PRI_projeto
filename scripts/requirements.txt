@@ -10,3 +10,4 @@ scipy==1.18.1
 ctranslate2==4.8.5
 sentencepiece==0.2.3
 scikit-learn==1.9.1
+nltk==3.10.4

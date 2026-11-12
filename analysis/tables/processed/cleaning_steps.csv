@@ -1,0 +1,9 @@
+table,step,remaining,removed,remaining_pct
+listings,raw,40154,,100.0
+listings,with at least one review,35442,4712.0,88.3
+listings,last review in the last 3 years,33767,1675.0,84.1
+listings,no required field missing,30590,3177.0,76.2
+reviews,raw,3018075,,100.0
+reviews,of a kept listing,2736327,281748.0,90.7
+reviews,non-empty comment,2736140,187.0,90.7
+reviews,at least 50 characters,2403239,332901.0,79.6

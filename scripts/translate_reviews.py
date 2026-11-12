@@ -29,6 +29,12 @@ MODEL_VERSIONS = {"fr": "fr_en-1_9", "es": "es_en-1_0", "pt": "pt_en-1_9", "de":
                   "it": "it_en-1_0", "nl": "nl_en-1_8"}
 CHUNK = 2000  # reviews between writes, which is what is lost if interrupted
 SENTENCE = re.compile(r"(?<=[.!?…])\s+")
+# What the models output for what they do not know, mostly emojis, with the joiners and variation selectors left over
+UNKNOWN = re.compile(r"\s*<unk>[‍︎️]*")
+
+
+def clean(text):
+    return re.sub(r" {2,}", " ", UNKNOWN.sub(" ", text)).strip()
 
 
 def load_translations():
@@ -94,8 +100,8 @@ def translate(translator, tokenizer, texts, beam):
     tokens = [tokenizer.encode(sentence, out_type=str) for sentence in unique]
     results = translator.translate_batch(tokens, beam_size=beam, max_batch_size=32, repetition_penalty=1.1,
                                          max_decoding_length=256)
-    english = {s: "".join(r.hypotheses[0]).replace("▁", " ").strip() for s, r in zip(unique, results)}
-    return [" ".join(english[s] for s in sentences) for sentences in parts]
+    english = {s: clean("".join(r.hypotheses[0]).replace("▁", " ")) for s, r in zip(unique, results)}
+    return [clean(" ".join(english[s] for s in sentences)) for sentences in parts]
 
 
 def main():
