@@ -1,4 +1,13 @@
+# The recipes need a POSIX shell. On Windows make falls back to cmd.exe unless SHELL is the full path of one, and
+# the bash found on the PATH may be the WSL stub, so use the one that comes with Git for Windows (8.3 name: no spaces).
+# With this, `make` works the same from PowerShell, cmd and Git Bash.
+ifeq ($(OS),Windows_NT)
+SHELL := $(firstword $(wildcard C:/PROGRA~1/Git/usr/bin/bash.exe C:/PROGRA~1/Git/bin/bash.exe) bash)
+# mkdir, rm, sed, grep, curl... live next to bash and are not on the PATH of a bash started by make
+export PATH := C:/PROGRA~1/Git/usr/bin;$(PATH)
+else
 SHELL := bash
+endif
 .SHELLFLAGS := -eu -o pipefail -c
 # A target whose recipe fails is deleted, so a half-written file is not taken as done
 .DELETE_ON_ERROR:
