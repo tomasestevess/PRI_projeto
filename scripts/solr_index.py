@@ -1,8 +1,10 @@
-"""Defines the Solr schema for the `airbnb` core and indexes data/processed/documents.jsonl.
+"""Defines the explicit Solr schema of a setup (configs/setupN.json) and indexes data/processed/documents.jsonl.
 
-Each listing is sent as a parent document with its reviews and pois as nested child documents.
+Setup 1 indexes the listings alone; setup 2 sends each listing as a parent document with its reviews and pois
+as nested child documents (see configs/ and docs/report_solr_schema.md).
 
-Usage: python scripts/solr_index.py [--solr http://localhost:8983/solr/airbnb] [--batch 200] [--limit N]
+Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://localhost:8983/solr]
+                                    [--batch 200] [--limit N] [--reset]
 """
 import argparse
 import json
@@ -22,25 +24,6 @@ from translate_reviews import load_translations
 
 DOCS = "data/processed/documents.jsonl"
 
-# All reviews go to comments_en, the translated ones with the text from scripts/translate_reviews.py.
-# Reviews without a translation are dropped, which covers the languages that are not translated.
-REVIEW_LANGS = {"en": "text_en"}
-TEXT = ["name", "description", "host_about", "wikipedia_title", "wikipedia_text"]
-STRINGS = ["doc_type", "city", "neighbourhood_cleansed", "neighbourhood_group_cleansed", "property_type",
-           "room_type", "bathrooms_text", "host_name", "host_location", "host_is_superhost",
-           "host_identity_verified", "has_availability", "lang", "category", "type", "reviewer_name",
-           "listing_url", "picture_url"]
-# Only returned in results, never searched or filtered, so they are stored but not indexed
-DISPLAY_ONLY = {"bathrooms_text", "host_name", "reviewer_name", "listing_url", "picture_url"}
-MULTI_STRINGS = ["amenities"]
-INTS = ["accommodates", "number_of_reviews", "number_of_reviews_ltm", "number_of_reviews_l30d",
-        "number_of_reviews_ly", "availability_30", "availability_60", "availability_90",
-        "availability_365", "availability_eoy", "poi_count_500m", "food_count_500m"]
-LONGS = ["listing_id"]
-FLOATS = ["price", "bathrooms", "bedrooms", "beds", "minimum_nights", "reviews_per_month", "distance_m",
-          "host_listings_count"] +          [f"review_scores_{k}" for k in
-          ["rating", "accuracy", "cleanliness", "checkin", "communication", "location", "value"]]
-DATES = ["first_review", "last_review", "date"]
 # Redundant or without value for search. Dropped before indexing, and removed from the schema if left over.
 # latitude and longitude are kept in the documents only to build `location`.
 DROP = ["price_quote_raw", "price_quote_total_price", "price_quote_price_per_night",
@@ -64,26 +47,36 @@ def call(url, payload):
         raise SystemExit(f"{e}\n{e.read().decode()[:2000]}")
 
 
-def define_schema(solr):
-    define_analysis(solr, REVIEW_LANGS)
+def schema_fields(schema):
+    """The (name, type, extra attributes) of every field of a setup, from its "schema" block."""
+    display = set(schema["display_only"])
+    not_stored = set(schema["not_stored"])
+
     def field(name, type_, **kw):
-        extra = {"indexed": False, "docValues": False} if name in DISPLAY_ONLY else {}
-        return {"name": name, "type": type_, "stored": True, **extra, **kw}
-    # wikipedia_text repeats on every POI child near the article, so it is searchable but not stored
-    fields = [field(n, "text_multi", stored=n != "wikipedia_text") for n in TEXT]
-    fields += [field(f"comments_{lang}", f"{t}_fold") for lang, t in REVIEW_LANGS.items()]
-    fields += [field(n, "string") for n in STRINGS]
-    fields += [field(n, "string", multiValued=True) for n in MULTI_STRINGS]
-    fields += [field(n, "pint") for n in INTS]
-    fields += [field(n, "plong") for n in LONGS]
-    fields += [field(n, "pfloat") for n in FLOATS]
-    fields += [field(n, "pdate") for n in DATES]
-    fields.append(field("location", "location"))
+        # Display-only fields are returned in results, never searched, filtered or sorted
+        extra = {"indexed": False, "docValues": False} if name in display else {}
+        return {"name": name, "type": type_, "stored": name not in not_stored, **extra, **kw}
+    fields = [field(n, t) for n, t in schema["text"].items()]
+    fields += [field(r["field"], r["type"]) for r in schema["review_text"].values()]
+    fields += [field(n, "string") for n in schema["string"]]
+    fields += [field(n, "string", multiValued=True) for n in schema["multi_string"]]
+    fields += [field(n, "pint") for n in schema["int"]]
+    fields += [field(n, "plong") for n in schema["long"]]
+    fields += [field(n, "pfloat") for n in schema["float"]]
+    fields += [field(n, "pdate") for n in schema["date"]]
+    fields.append(field(schema["location"], "location"))
+    return fields
+
+
+def define_schema(solr, config):
+    # The _default configset guesses the type of unknown fields (schemaless); here every field is declared
+    call(f"{solr}/config", {"set-user-property": {"update.autoCreateFields": "false"}})
+    define_analysis(solr, config["analysis"], config["synonyms"])
     for name in DROP:
         if exists(solr, name):
             call(f"{solr}/schema", {"delete-field": {"name": name}})
     # Fields may already exist when the script is rerun, so replace instead of add
-    for f in fields:
+    for f in schema_fields(config["schema"]):
         r = json.loads(call(f"{solr}/schema", {"add-field": f}) if not exists(solr, f["name"])
                        else call(f"{solr}/schema", {"replace-field": f}))
         assert "errors" not in r, r
@@ -113,12 +106,12 @@ class PoiDensity:
         doc["food_count_500m"] = int(self.food.query_ball_point(point, dp.POI_RADIUS_M, return_length=True)[0])
 
 
-def clean(doc):
+def clean(doc, date_fields):
     if doc.get("latitude") is not None and doc.get("longitude") is not None:
         doc["location"] = f"{doc['latitude']},{doc['longitude']}"
     for k in DROP:
         doc.pop(k, None)
-    for k in DATES:
+    for k in date_fields:
         if doc.get(k):
             doc[k] = doc[k][:10] + "T00:00:00Z"
     return doc
@@ -137,50 +130,70 @@ def report(solr, start):
     print(f"indexing time: {time.time() - start:.0f} s, index size: {index['size']}")
 
 
+def nest(doc, config, translations):
+    """Keeps (setup 2) or removes (setup 1) the child documents.
+
+    Only English reviews are kept: those in English, and the translations of the languages in
+    `review_translated`, all in comments_en. A review in one of those languages without a translation yet is
+    skipped, and so is a review in any other language."""
+    schema, dates = config["schema"], config["schema"]["date"]
+    reviews, pois = doc.pop("reviews", []), doc.pop("pois", [])
+    if config["nested"]["reviews"]:
+        kept = []
+        for r in reviews:
+            comments, lang = r.pop("comments"), r.get("lang")
+            if lang in schema["review_translated"]:
+                comments = translations.get(r["id"])
+            elif lang != "en":
+                comments = None
+            if comments:
+                r["comments_en"] = comments
+                kept.append(clean(r, dates))
+        doc["reviews"] = kept
+    if config["nested"]["pois"]:
+        for p in pois:  # own field, so the POI names do not distort the statistics of the listing `name`
+            p["poi_name"] = p.pop("name")
+        doc["pois"] = [clean(p, dates) for p in pois]
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--solr", default="http://localhost:8983/solr/airbnb")
+    ap.add_argument("--setup", default="configs/setup2.json", help="configs/setup1.json or configs/setup2.json")
+    ap.add_argument("--solr", default="http://localhost:8983/solr", help="Solr base URL; the core is in the setup")
     ap.add_argument("--batch", type=int, default=200)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--reset", action="store_true", help="delete every document before indexing")
     args = ap.parse_args()
 
-    define_schema(args.solr)
+    config = json.loads(Path(args.setup).read_text(encoding="utf-8"))
+    solr = f"{args.solr.rstrip('/')}/{config['core']}"
+    define_schema(solr, config)
     density = PoiDensity()
-    translations = load_translations()
+    translations = load_translations() if config["nested"]["reviews"] else {}
     print(f"{len(translations)} translated reviews")
     if args.reset:
-        call(f"{args.solr}/update?commit=true", {"delete": {"query": "*:*"}})
+        call(f"{solr}/update?commit=true", {"delete": {"query": "*:*"}})
     start = time.time()
     batch, total = [], 0
     with open(DOCS, encoding="utf-8") as f:
         for line in f:
             listing = json.loads(line)
             density.add(listing)  # needs latitude and longitude, which clean() drops
-            batch.append(clean(listing))
-            reviews = []
-            for r in batch[-1].get("reviews", []):
-                comments = r.pop("comments")
-                text = comments if r.get("lang") == "en" else translations.get(r["id"])
-                if text:
-                    r["comments_en"] = text
-                    reviews.append(r)
-            batch[-1]["reviews"] = reviews
-            for child in reviews + batch[-1].get("pois", []):
-                clean(child)
+            nest(listing, config, translations)
+            batch.append(clean(listing, config["schema"]["date"]))
             if len(batch) == args.batch:
-                call(f"{args.solr}/update", batch)
+                call(f"{solr}/update", batch)
                 total += len(batch)
                 batch = []
-                print(f"\rindexed {total}", end="", flush=True)
+                print(f"{chr(13)}indexed {total}", end="", flush=True)
             if args.limit and total + len(batch) >= args.limit:
                 break
     if batch:
-        call(f"{args.solr}/update", batch)
+        call(f"{solr}/update", batch)
         total += len(batch)
-    call(f"{args.solr}/update", {"commit": {}})
-    print(f"\rindexed {total} listings, committed")
-    report(args.solr, start)
+    call(f"{solr}/update", {"commit": {}})
+    print(f"{chr(13)}indexed {total} listings into {config['core']}, committed")
+    report(solr, start)
 
 
 if __name__ == "__main__":

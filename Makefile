@@ -84,9 +84,9 @@ solr-up:
 solr-down:
 	docker compose down
 
-# Defines the schema and reindexes everything
+# Defines the schema of both setups (configs/) and reindexes everything in each one
 index: solr-up data/processed/documents.jsonl
-	$(PYTHON) -u scripts/solr_index.py --reset $(ARGS)
+	for setup in 1 2; do $(PYTHON) -u scripts/solr_index.py --setup configs/setup$$setup.json --reset $(ARGS) || exit 1; done
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar
