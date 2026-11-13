@@ -1,0 +1,27 @@
+<top>
+<num> Number: IN1
+<title> quiet apartment near historic monuments in Porto
+<desc> Description: A traveller visiting Porto wants a calm place to sleep that is within walking distance of the city's historic sights.
+<narr> Narrative: Relevant: the listing is in Porto, a historic POI (such as the Sé do Porto) is within 500 m, and the description or the reviews say the place is quiet. Not relevant: no historic POI within 500 m, or the reviews mainly complain about noise.
+</top>
+
+<top>
+<num> Number: IN2
+<title> family apartment close to the beach in Lisbon
+<desc> Description: A family travelling with children wants an apartment in Lisbon that is big enough for everyone and close to the beach.
+<narr> Narrative: Relevant: the listing is in Lisbon, a beach POI is within 500 m, it accommodates at least four guests and the reviews mention families or children. Not relevant: it sleeps fewer than four, or there is no beach POI within 500 m.
+</top>
+
+<top>
+<num> Number: IN3
+<title> easy self check-in for a late arrival
+<desc> Description: A traveller who will arrive late at night wants to check in easily, without waiting for the host and without problems getting in.
+<narr> Narrative: Relevant: the reviews say check-in was easy or smooth late at night, or that the host answered quickly. Not relevant: the reviews report problems with keys, codes or a late check-in, or the host did not answer.
+</top>
+
+<top>
+<num> Number: IN5
+<title> apartment with a functioning elevator
+<desc> Description: A traveller who has difficulty with stairs wants a listing in a building with an elevator that is available and working.
+<narr> Narrative: Relevant: the description or the amenities mention an elevator and no review says it is broken or out of service. Not relevant: no elevator is mentioned, or a review says it did not work or that there is none. If old and new reviews disagree, the most recent one decides.
+</top>

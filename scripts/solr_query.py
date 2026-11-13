@@ -4,6 +4,7 @@ The query file is the same for every setup: the text, the filters and the fields
 matched (analyzers, qf/pf, boosts, nested documents) comes from the "query" block of the setup config.
 
 Usage: python scripts/solr_query.py scripts/queries/rural_quiet.json --setup configs/setup1.json configs/setup2.json
+       add --trec runs/setup1.run to also write a TREC run file
 """
 import argparse
 import json
@@ -29,6 +30,7 @@ def main():
     ap.add_argument("--setup", nargs="+", required=True)
     ap.add_argument("--solr", default="http://localhost:8983/solr")
     ap.add_argument("--raw", action="store_true", help="print the JSON response")
+    ap.add_argument("--trec", help="append the results to this TREC run file (qid Q0 docid rank score runid)")
     args = ap.parse_args()
     query = json.loads(Path(args.query).read_text(encoding="utf-8"))
     for path in args.setup:
@@ -37,6 +39,11 @@ def main():
             response = run(args.solr.rstrip("/"), config, query)
         except urllib.error.HTTPError as e:
             raise SystemExit(f"{config['setup']}: {e}\n{e.read().decode()[:1500]}")
+        if args.trec:  # qid comes from the file name: in3.setup1.json -> IN3
+            qid = Path(args.query).name.split(".")[0].upper()
+            with open(args.trec, "a", encoding="utf-8") as f:
+                for rank, d in enumerate(response["docs"], 1):
+                    f.write(f"{qid} Q0 {d['id']} {rank} {d.get('score', 0):.6f} {config['setup']}\n")
         print(f"\n== {config['setup']}: {response['numFound']} results for {query['query']!r}")
         for d in response["docs"]:
             print(json.dumps(d, ensure_ascii=False) if args.raw else

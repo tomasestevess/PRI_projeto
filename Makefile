@@ -25,7 +25,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down index adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down index run-queries adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -88,6 +88,16 @@ solr-down:
 index: solr-up data/processed/documents.jsonl
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --reset $(ARGS)
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --reset $(ARGS)
+
+# Runs IN1, IN2, IN3 and IN5 on both setups (scripts/queries/inN.setupM.json) and writes the TREC run files runs/setup1.run and runs/setup2.run
+run-queries: solr-up
+	mkdir -p runs
+	for s in setup1 setup2; do \
+		rm -f runs/$$s.run; \
+		for n in 1 2 3 5; do \
+			$(PYTHON) scripts/solr_query.py scripts/queries/in$$n.$$s.json --setup configs/$$s.json --trec runs/$$s.run || exit 1; \
+		done; \
+	done
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

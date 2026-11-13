@@ -1,0 +1,11 @@
+{
+  "description": "IN2: Family apartment in Lisbon for at least 4 guests, with a beach within 500 m. (setup 1: only listing fields, no POIs or reviews.)",
+  "query": "family apartment close to the beach in Lisbon",
+  "filter": [
+    "doc_type:listing",
+    "city:lisboa",
+    "accommodates:[4 TO *]"
+  ],
+  "fields": "id,name,city,neighbourhood_cleansed,price,accommodates,review_scores_rating,listing_url,score",
+  "limit": 100
+}
