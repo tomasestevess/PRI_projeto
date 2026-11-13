@@ -3,7 +3,7 @@
 ## How to judge
 
 - Give each listing a grade of 1 for relevant or 0 for not relevant.
-- Use the description, the amenities, the list of nearby POIs and the reviews. (Reviews traduzidas?)
+- Use the description, the amenities, the list of nearby POIs and the reviews.
 - One clear review is enough as evidence. If most reviews say the opposite, the listing is not relevant.
 - Do not talk to the other judge before you finish.
 - You do not know which setup returned the listing.
