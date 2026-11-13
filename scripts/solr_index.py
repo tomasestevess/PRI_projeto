@@ -76,7 +76,9 @@ def define_schema(solr, config):
         if exists(solr, name):
             call(f"{solr}/schema", {"delete-field": {"name": name}})
     # Fields may already exist when the script is rerun, so replace instead of add
-    for f in schema_fields(config["schema"]):
+    # _nest_parent_ holds the id of the parent listing of each review and POI; Solr fills it when the field exists
+    nest_parent = {"name": "_nest_parent_", "type": "string", "indexed": True, "stored": True}
+    for f in schema_fields(config["schema"]) + [nest_parent]:
         r = json.loads(call(f"{solr}/schema", {"add-field": f}) if not exists(solr, f["name"])
                        else call(f"{solr}/schema", {"replace-field": f}))
         assert "errors" not in r, r

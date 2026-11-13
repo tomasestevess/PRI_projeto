@@ -7,7 +7,7 @@
 - One clear review is enough as evidence. If most reviews say the opposite, the listing is not relevant.
 - Do not talk to the other judge before you finish.
 - You do not know which setup returned the listing.
-- If you are not sure, give 0 and write a "?" in the notes column.
+- If the evidence is missing or you cannot decide, give 0 and write a "?" in the notes column. The "Doubtful" cases below say how to grade the ones that are already settled.
 - The POI list keeps only the five nearest POIs of each category. A POI that is missing from the list may still exist. Use the reviews to check.
 
 ## IN1: Quiet apartment near historic monuments in Porto
@@ -22,7 +22,7 @@
 
 **Query:** "Family apartment close to the beach in Lisbon."
 
-- **Relevant:** the listing is in Lisbon. A beach POI is within 500 m. It accomodates at least four guests. The reviews mention families or children.
+- **Relevant:** the listing is in Lisbon. A beach POI is within 500 m. It accommodates at least four guests. The reviews mention families or children.
 - **Not relevant:** it sleeps fewer than four. Or there is no beach POI within 500 m.
 - **Doubtful:** the description says "family friendly" but no review mentions families or children. This is not relevant.
 
@@ -34,7 +34,7 @@
 - **Not relevant:** the reviews report problems with keys, codes or a late check-in. Or the host did not answer.
 - **Doubtful:** "Self check-in" is in the amenities but no review talks about it. This is not relevant, because this need relies on the reviews.
 
-## IN5: Accessible stay
+## IN4: Accessible stay
 
 **Query:** "Apartment with a functioning elevator."
 

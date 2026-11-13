@@ -86,7 +86,8 @@ solr-down:
 
 # Defines the schema of both setups (configs/) and reindexes everything in each one
 index: solr-up data/processed/documents.jsonl
-	for setup in 1 2; do $(PYTHON) -u scripts/solr_index.py --setup configs/setup$$setup.json --reset $(ARGS) || exit 1; done
+	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --reset $(ARGS)
+	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --reset $(ARGS)
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar
