@@ -1,0 +1,5 @@
+rating_band,listings,median_sentiment,negative_reviews_pct
+below 4,55,0.56,17.6
+4 to 4.5,2156,0.741,7.4
+4.5 to 4.8,8901,0.836,2.9
+4.8 or more,10337,0.897,0.8

@@ -1,0 +1,13 @@
+city,room_type,area,listings,price,price_per_guest
+lisboa,Entire home/apt,centre,7782,156.3,45.5
+lisboa,Entire home/apt,coast,1934,185.5,46.2
+lisboa,Entire home/apt,other,4875,146.1,38.4
+lisboa,Private room,centre,1523,70.0,37.5
+lisboa,Private room,coast,409,92.0,45.0
+lisboa,Private room,other,2184,63.0,33.5
+porto,Entire home/apt,centre,7258,120.0,39.5
+porto,Entire home/apt,coast,1041,152.3,38.0
+porto,Entire home/apt,other,1779,125.5,32.4
+porto,Private room,centre,651,71.0,37.0
+porto,Private room,coast,229,80.0,36.8
+porto,Private room,other,637,61.3,31.2

@@ -1,9 +1,8 @@
 """Text analysis for the `airbnb` core: accent folding and query-time synonyms.
 
 For every language in REVIEW_LANGS a `<type>_fold` field type is derived from Solr's own type
-(text_pt -> text_pt_fold), with the same filters plus:
-  - a managed synonym filter right after the first lowercase filter (query side only), before the
-    stop filter so the synonyms are written with their accents
+(text_en -> text_en_fold), with the same filters plus:
+  - a managed synonym filter right after the first lowercase filter (query side only)
   - asciiFolding right after the stop filter, before the stemmer, so stop words keep matching
 `text_multi` is the simple type for listing texts, which are in mixed languages: no stemming.
 
@@ -14,23 +13,17 @@ import urllib.parse
 import urllib.request
 
 FOLD = {"name": "asciiFolding"}
-# Terms in one list are equivalent to each other. Only the most frequent languages have synonyms.
+# Terms in one list are equivalent to each other. Reviews are all in English; pt is for the listing texts.
+# The English lists include the variants that the translations produce (air conditioner, subway, elevator).
 SYNONYMS = {
-    "en": [["air conditioning", "ac", "aircon"], ["apartment", "flat"], ["quiet", "peaceful", "calm", "silent"],
-           ["dirty", "filthy", "unclean"], ["broken", "faulty", "malfunctioning"],
-           ["breakfast", "brunch"], ["noisy", "loud"], ["wifi", "internet"]],
+    "en": [["air conditioning", "air conditioner", "ac", "aircon"], ["apartment", "flat"],
+           ["quiet", "peaceful", "calm", "silent"], ["dirty", "filthy", "unclean"],
+           ["broken", "faulty", "malfunctioning"], ["breakfast", "brunch"], ["noisy", "loud"],
+           ["wifi", "internet"], ["metro", "subway"], ["elevator", "lift"]],
     "pt": [["ar condicionado", "ac", "climatização"], ["apartamento", "flat"],
            ["sossegado", "tranquilo", "silencioso", "calmo"], ["sujo", "imundo"],
            ["avariado", "estragado", "partido", "avariada", "estragada"],
            ["pequeno almoço", "pequeno-almoço", "pequeno almoco"], ["barulhento", "ruidoso"]],
-    "es": [["aire acondicionado", "ac", "climatización"], ["apartamento", "piso"],
-           ["tranquilo", "silencioso", "sosegado", "calmado"], ["sucio", "inmundo"],
-           ["roto", "averiado", "estropeado"], ["desayuno", "brunch"], ["ruidoso", "bullicioso"]],
-    "fr": [["climatisation", "clim", "air conditionné"], ["appartement", "studio"],
-           ["calme", "tranquille", "silencieux"], ["sale", "crasseux"],
-           ["cassé", "en panne", "défectueux"], ["petit déjeuner", "petit-déjeuner"], ["bruyant", "sonore"]],
-    "de": [["klimaanlage", "klima"], ["wohnung", "apartment"], ["ruhig", "leise", "still"],
-           ["schmutzig", "dreckig"], ["kaputt", "defekt"], ["frühstück", "fruehstueck"], ["laut", "lärm"]],
 }
 MULTI_SYNONYMS = ["en", "pt"]  # applied to the mixed-language listing texts
 

@@ -11,6 +11,16 @@ articles_linked_to_pois,778
 listings_kept_pct,76.2
 reviews_kept_pct,79.6
 documents_gb,2.67
+listings_after_raw,40154
+listings_after_with_at_least_one_review,35442
+listings_after_last_review_in_the_last_3_years,33767
+listings_after_no_required_field_missing,30590
+reviews_after_raw,3018075
+reviews_after_of_a_kept_listing,2736327
+reviews_after_non-empty_comment,2736140
+reviews_after_at_least_50_characters,2403239
+listings_missing_description,701
+listings_missing_price,2516
 room_type_pct_Entire home/apt,80.6
 room_type_pct_Hotel room,0.3
 room_type_pct_Private room,18.4
@@ -74,6 +84,42 @@ corr_pois_reviews_porto,0.26
 corr_pois_bedrooms_porto,-0.25
 rating_median_superhost,4.87
 rating_median_not_superhost,4.68
+price_per_guest_median_entire,41.0
+accommodates_median_entire,4.0
+price_per_guest_median_private,35.5
+accommodates_median_private,2.0
+area_centre_pct_lisboa,49.6
+price_median_entire_centre_lisboa,156.3
+price_per_guest_median_entire_centre_lisboa,45.5
+price_median_private_centre_lisboa,70.0
+price_per_guest_median_private_centre_lisboa,37.5
+area_coast_pct_lisboa,12.7
+price_median_entire_coast_lisboa,185.5
+price_per_guest_median_entire_coast_lisboa,46.2
+price_median_private_coast_lisboa,92.0
+price_per_guest_median_private_coast_lisboa,45.0
+area_other_pct_lisboa,37.8
+price_median_entire_other_lisboa,146.1
+price_per_guest_median_entire_other_lisboa,38.4
+price_median_private_other_lisboa,63.0
+price_per_guest_median_private_other_lisboa,33.5
+corr_price_centre_km_entire_lisboa,0.02
+area_centre_pct_porto,68.0
+price_median_entire_centre_porto,120.0
+price_per_guest_median_entire_centre_porto,39.5
+price_median_private_centre_porto,71.0
+price_per_guest_median_private_centre_porto,37.0
+area_coast_pct_porto,11.0
+price_median_entire_coast_porto,152.3
+price_per_guest_median_entire_coast_porto,38.0
+price_median_private_coast_porto,80.0
+price_per_guest_median_private_coast_porto,36.8
+area_other_pct_porto,21.0
+price_median_entire_other_porto,125.5
+price_per_guest_median_entire_other_porto,32.4
+price_median_private_other_porto,61.3
+price_per_guest_median_private_other_porto,31.2
+corr_price_centre_km_entire_porto,0.06
 review_words_total_millions,116
 review_words_median,37.0
 review_words_p95,129.0
@@ -93,7 +139,17 @@ amenities_per_listing_median,35.0
 distinct_amenities,4902
 reviews_mentioning_quiet_pct,5.7
 reviews_mentioning_noise or noisy_pct,3.6
-reviews_mentioning_metro_pct,5.2
 reviews_mentioning_check-in_pct,7.4
 reviews_mentioning_elevator or lift_pct,1.3
-reviews_mentioning_dog_pct,0.3
+english_reviews,1375911
+english_reviews_positive_pct,97.9
+english_reviews_negative_pct,1.6
+english_reviews_neutral_pct,0.5
+listings_with_sentiment,21449
+corr_sentiment_rating,0.67
+corr_sentiment_rating_lisboa,0.68
+corr_sentiment_rating_porto,0.64
+negative_reviews_pct_rating_below_4,17.6
+negative_reviews_pct_rating_4_to_4.5,7.4
+negative_reviews_pct_rating_4.5_to_4.8,2.9
+negative_reviews_pct_rating_4.8_or_more,0.8
