@@ -34,14 +34,6 @@
 - **Not relevant:** the reviews report problems with keys, codes or a late check-in. Or the host did not answer.
 - **Doubtful:** "Self check-in" is in the amenities but no review talks about it. This is not relevant, because this need relies on the reviews.
 
-## IN4: Travelling without a car
-
-**Query:** "Apartment near the metro, no car needed."
-
-- **Relevant:** a metro or train station is within 500 m. The reviews say the access to public transport is good.
-- **Not relevant:** the reviews say you need a car.
-- **Doubtful:** no station in the POI list but a review says "metro 5 minutes away". This is relevant.
-
 ## IN5: Accessible stay
 
 **Query:** "Apartment with a functioning elevator."
@@ -50,19 +42,3 @@
 - **Not relevant:** no elevator is mentioned. Or a review says the elevator did not work. Or a review says there is no elevator.
 - **Doubtful:** a review says the elevator is old or small but it works. This is relevant.
 - **Old and new reviews disagree:** use the most recent review. If an old review says the elevator was broken and a newer review says it works, the elevator works. This is relevant. If the newest review says it is broken, this is not relevant.
-
-## IN6: Nightlife
-
-**Query:** "Apartment close to bars and nightlife in Lisbon."
- 
-- **Relevant:** the listing is in Lisbon. At least two bars are within 300 m. The reviews mention nightlife or a lively area.
-- **Not relevant:** the listing says it is quiet and isolated. Or the reviews say there is nothing nearby.
-- **Doubtful:** bars are close but no review talks about nightlife. This is not relevant.
-- **Closing time:** a bar must be open at night. A bar that closes before 23:00 does not count. If the data has no opening hours, use the reviews. If the reviews say the area is quiet or empty at night, this is not relevant.
-
-## IN7: Travelling with a dog
-
-**Query:** "Pet friendly apartment near a park for walking the dog."
-
-- **Relevant:** the amenities or the description allow pets. A park POI is within 500 m. The reviews mention dogs or pets.
-- **Not relevant:** pets are not allowed. Or there is no park POI within 500 m.
