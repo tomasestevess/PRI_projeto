@@ -14,6 +14,8 @@
 
 **Query:** "Quiet apartment near historic monuments in Porto."
 
+**Description:** A traveller visiting Porto wants a calm place to sleep that is within walking distance of the city's historic sights.
+
 - **Relevant:** the listing is in Porto. A historic POI, such as the Sé do Porto, is within 500 m. The description or the reviews say the place is quiet.
 - **Not relevant:** no historic POI within 500 m. Or the reviews mainly complain about noise.
 - **Doubtful:** one review says noisy and many say quiet. This is relevant.
@@ -21,6 +23,8 @@
 ## IN2: Family beach holiday
 
 **Query:** "Family apartment close to the beach in Lisbon."
+
+**Description:** A family travelling with children wants an apartment in Lisbon that is big enough for everyone and close to the beach.
 
 - **Relevant:** the listing is in Lisbon. A beach POI is within 500 m. It accommodates at least four guests. The reviews mention families or children.
 - **Not relevant:** it sleeps fewer than four. Or there is no beach POI within 500 m.
@@ -30,6 +34,8 @@
 
 **Query:** "Easy self check-in for a late arrival."
 
+**Description:** A traveller who will arrive late at night wants to check in easily, without waiting for the host and without problems getting in.
+
 - **Relevant:** the reviews say check-in was easy or smooth late at night. Or the reviews say the host answered quickly.
 - **Not relevant:** the reviews report problems with keys, codes or a late check-in. Or the host did not answer.
 - **Doubtful:** "Self check-in" is in the amenities but no review talks about it. This is not relevant, because this need relies on the reviews.
@@ -37,6 +43,8 @@
 ## IN4: Accessible stay
 
 **Query:** "Apartment with a functioning elevator."
+
+**Description:** A traveller who has difficulty with stairs wants a listing in a building with an elevator that is available and working.
 
 - **Relevant:** the description or the amenities mention an elevator. No review says it is broken or out of service.
 - **Not relevant:** no elevator is mentioned. Or a review says the elevator did not work. Or a review says there is no elevator.
