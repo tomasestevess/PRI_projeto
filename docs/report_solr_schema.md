@@ -111,11 +111,13 @@ Checked on the running cores:
 | Listing text `qf` / `pf` | `name^3 description^2 host_about^0.5` / `name^6 description^4`, `ps=2`, `tie=0.1`, `mm=2<-1 5<50%` | same |
 | Evidence from children | none | `{!parent}` score of reviews (`^0.5`, `score=avg`) and of POIs (`^0.3`, `score=max`), combined with OR so that a listing can be found through them |
 | Quality boost | none | multiplicative `1 + 0.1·rating + 0.02·ln(1 + number_of_reviews)` (about 1.0–1.6) |
-| Filters | identical (`scripts/queries/*.json`) | identical |
+| Query files | paired per topic (`inN.setup1.json`, `inN.setup2.json`) | same JSON structure and topic text; setup 2 can add filters over nested reviews and POIs |
 
-The setups share the data, the hard filters and the listing-text edismax parameters, and each query file is
-the same for both (`scripts/solr_query.py query.json --setup configs/setup1.json configs/setup2.json`). The
-difference in results therefore comes from three things, each with a reason:
+The setups share the collection and listing-text edismax parameters. Each topic has a query file for each
+setup because setup 1 has no review or POI children to filter. The query text and displayed result fields
+match across each pair; setup 2 may add child-based filters (as IN1 and IN2 do). The difference in results
+therefore comes from the ranking evidence and, for those topics, the filters supported by each document
+model:
 1. **Nested reviews and POIs**: users ask about experience and surroundings, which only exist in the children. Cost: far more documents (in the 3,000-listing test below, 117,721 review and 88,919 POI children for 3,000 parents), and each of the 291,355 POI children with an article repeats its full Wikipedia text.
 2. **Language-aware analysis**: 43 % of the reviews are not English, and with a simple analyzer plurals and verb forms never match. Translation to English plus English stemming puts the reviews of the six translated languages in one searchable vocabulary.
 3. **Boosts**: rating and popularity break ties between textually similar listings.
