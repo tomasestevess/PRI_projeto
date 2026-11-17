@@ -20,7 +20,8 @@ FIELDS = "id,name,neighbourhood_cleansed,price,accommodates,listing_url"
 
 
 def read_run(path):
-    ranks = defaultdict(dict)  # qid -> docid -> rank
+    ranks = defaultdict(dict)  
+    # qid -> docid -> rank
     for line in Path(path).read_text(encoding="utf-8").splitlines():
         qid, _, docid, rank, _, _ = line.split()
         ranks[qid][docid] = int(rank)
@@ -28,27 +29,34 @@ def read_run(path):
 
 
 def fetch_metadata(solr, config, docids):
+    # fetches the display fields for the given docids from the Solr core specified in config
     params = {"q": "{!terms f=id}" + ",".join(docids), "fq": "doc_type:listing",
               "fl": FIELDS, "rows": len(docids), "wt": "json"}
+    # encode the parameters for a POST request
     body = urllib.parse.urlencode(params, doseq=True).encode()
+    # send the request to Solr and parse the JSON response
     req = urllib.request.Request(f"{solr}/{config['core']}/select", body,
                                  {"Content-Type": "application/x-www-form-urlencoded"})
+    # read the response and extract the documents
     docs = json.loads(urllib.request.urlopen(req, timeout=120).read())["response"]["docs"]
     return {d["id"]: d for d in docs}
 
 
 def build_pool(names, runs, k):
     pool = defaultdict(dict)  
+    # qid -> docid -> {setup_name: rank}
     for name, run in zip(names, runs):
         for qid, docs in run.items():
             for docid, rank in docs.items():
                 if rank <= k:
+                    # add the rank of this docid for this setup to the pool for this qid
                     pool[qid].setdefault(docid, {})[name] = rank
     return pool
 
 
 def write_pool(path, pool, meta, names):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
+    # write the pool to a CSV file with the specified columns
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "listing_url",
@@ -75,6 +83,7 @@ def main():
     names = [c["setup"] for c in configs]
     pool = build_pool(names, [read_run(p) for p in args.runs], args.k)
 
+    # fetch metadata for all unique docids in the pool from the Solr core of the first setup
     all_ids = sorted({d for docs in pool.values() for d in docs})
     try:
         meta = fetch_metadata(args.solr.rstrip("/"), configs[0], all_ids) if all_ids else {}
