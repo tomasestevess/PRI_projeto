@@ -35,7 +35,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool judge qrels adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool judge qrels evaluate adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -133,15 +133,19 @@ tie-ablation: check-queries solr-up
 pool: run-queries tie-ablation
 	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run"
 
-# Interactive judgement of the pool, one rater at a time: make judge RATER=A (A and B judge IN1 and IN3, C and D
-# judge IN2 and IN4). Answers go to evaluation/judgements_<RATER>.csv after each listing
+# Interactive judgement of the pool: make judge RATER=A [ARGS="--qids IN1"]. One decision per listing, any rater can
+# judge any need; listings already judged by others are skipped. Answers go to evaluation/judgements_<RATER>.csv
 judge:
 	$(PYTHON) scripts/judge.py --rater $(RATER) $(ARGS)
 
-# Merges the judgements: agreement and kappa per need, evaluation/disagreements.csv to resolve in
-# evaluation/resolutions.csv, and evaluation/qrels.txt
+# Merges the judgements of every rater into evaluation/qrels.txt (one decision per listing; conflicts, if any, in
+# evaluation/conflicts.csv)
 qrels:
 	$(PYTHON) scripts/merge_judgements.py
+
+# P@50, AP, MAP, 11-point precision-recall curves and AUC of both setups (evaluation/metrics.csv, evaluation/figures/)
+evaluate:
+	$(PYTHON) scripts/evaluate.py
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

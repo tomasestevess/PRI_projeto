@@ -1,13 +1,14 @@
 """Interactive relevance judgement of the evaluation pool, in the terminal.
 
-Each rater judges the needs of their pair (A and B: IN1 and IN3; C and D: IN2 and IN4), one listing at a time, in
-a random order that is fixed per rater. The screen shows the relevance criteria of the need and, for the listing,
-what evaluation/pool.csv has: name, area, price, capacity, link, and the reviews and POIs that best match the query.
-It never shows which setup returned the listing, at which rank, or what the other rater answered.
+Each pooled listing needs a single decision, and any rater can judge any need. A rater judges the listings that
+no rater has judged yet (it reads every evaluation/judgements_*.csv, so pull the others' files first), one at a time,
+need by need, in a random order that is fixed per rater. To split the work, give each rater different needs with
+--qids. The screen shows the relevance criteria of the need and, for the listing, what evaluation/pool.csv has:
+name, area, price, capacity, link, and the reviews and POIs that best match the query. It never shows which setup
+returned the listing or at which rank.
 
 Answers are saved after each one in evaluation/judgements_<rater>.csv (qid, docid, rel, note, time), so the rater
-can stop and continue later. scripts/merge_judgements.py then compares the two raters of each need and writes the
-qrels.
+can stop and continue later. scripts/merge_judgements.py then writes the qrels.
 
 Commands (type and press Enter):
   1 / 0       relevant / not relevant
@@ -20,7 +21,7 @@ Commands (type and press Enter):
   b           back to the previous listing      s   skip for now
   h           help                              q   quit (answers are already saved)
 
-Usage: python scripts/judge.py --rater A [--qids IN1 IN3] [--pool evaluation/pool.csv]
+Usage: python scripts/judge.py --rater A [--qids IN1 IN3] [--pool evaluation/pool.csv]   (default: every need)
 """
 import argparse
 import csv
@@ -38,7 +39,6 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PAIRS = {"A": ["IN1", "IN3"], "B": ["IN1", "IN3"], "C": ["IN2", "IN4"], "D": ["IN2", "IN4"]}
 FIELDS = ["qid", "docid", "rel", "note", "time"]
 
 
@@ -117,8 +117,8 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stdin.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--rater", required=True, help="A, B, C or D (the letter in the notes)")
-    ap.add_argument("--qids", nargs="+", help="needs to judge (default: those of the rater's pair)")
+    ap.add_argument("--rater", required=True, help="a short name for the rater, e.g. A, B, C or D")
+    ap.add_argument("--qids", nargs="+", help="needs to judge (default: every need in the pool)")
     ap.add_argument("--pool", default="evaluation/pool.csv")
     ap.add_argument("--criteria", default="docs/relevance-criteria.md")
     ap.add_argument("--out", help="default: evaluation/judgements_<rater>.csv")
@@ -128,14 +128,18 @@ def main():
     args = ap.parse_args()
 
     rater = args.rater.upper()
-    qids = args.qids or PAIRS.get(rater)
-    if not qids:
-        sys.exit(f"unknown rater {rater}: use --qids")
     out = args.out or f"evaluation/judgements_{rater}.csv"
     with open(args.pool, encoding="utf-8", newline="") as f:
-        rows = [r for r in csv.DictReader(f) if r["qid"] in qids]
+        rows = list(csv.DictReader(f))
+    qids = args.qids or sorted({r["qid"] for r in rows})
+    # one decision per listing: skip what the other raters have already judged
+    others = set()
+    for path in Path(out).parent.glob("judgements_*.csv"):
+        if path.resolve() != Path(out).resolve():
+            others |= set(load(path))
+    rows = [r for r in rows if r["qid"] in qids and (r["qid"], r["docid"]) not in others]
     if not rows:
-        sys.exit(f"no listings of {qids} in {args.pool}: run make pool first")
+        sys.exit(f"nothing to judge for {qids} in {args.pool}: already judged by others, or run make pool first")
     # random order, the same every time for this rater, need by need
     rng = random.Random(f"judge-{rater}")
     order = []
@@ -151,7 +155,7 @@ def main():
                                 .read_text(encoding="utf-8"))["query"] for q in qids}
 
     i = next((k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements), len(order))
-    message = ""
+    message = f"{len(others)} listings already judged by other raters are skipped" if others else ""
     while True:
         if i >= len(order):
             missing = [k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements]
