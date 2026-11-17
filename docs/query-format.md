@@ -1,6 +1,6 @@
 # Query files, filters and block joins
 
-The in-scope topics are IN1, IN2, IN3 and IN5. Each topic has one JSON file per Solr setup:
+The in-scope topics are IN1, IN2, IN3 and IN4. Each topic has one JSON file per Solr setup:
 `scripts/queries/inN.setup1.json` and `scripts/queries/inN.setup2.json`.
 
 ## JSON format

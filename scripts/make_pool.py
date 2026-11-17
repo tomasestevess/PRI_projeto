@@ -1,19 +1,30 @@
-"""Builds the evaluation pool: top-k (default 50) of each setup's run file per IN, merged without duplicates.
+"""Builds the evaluation pool of each information need, to be judged by hand.
 
-The run files are the ones written by scripts/solr_query.py with --trec (make run-queries). For each pooled
-listing, the display fields and the reviews and POIs that best match the topic's query are fetched from the
-setup with nested documents (setup 2), through Solr's [subquery] transformer (child_params in solr_query.py),
-so the raters see the evidence of each listing next to it. The query of each topic is read from its query file,
-scripts/queries/<qid>.<setup>.json.
+The pool of a need has:
+  1. the top k (default 50) of each run, merged without duplicates. The runs are the ones of make run-queries
+     and, with --extra-runs, other runs to be compared on the same judgements, such as the tie variants of
+     scripts/tie_ablation.py (runs/tie/*.run);
+  2. a semi-automatic extension: the results ranked k+1 to --tfidf-depth (default 200) in the main runs are
+     scored by tf-idf against the topic (title and description in docs/topics/topics.trec), over the name and
+     description of each listing, and the --tfidf-n (default 10) best of each need are added, so that relevant
+     listings just below the top k are also judged. The rest of those results are not judged.
 
-Usage: python scripts/make_pool.py [--k 50] [--children 3] --setup configs/setup1.json configs/setup2.json
-Writes evaluation/pool.csv with one row per (qid, docid) and one relevance column per rater.
-Rows are sorted by docid, not by rank, and the CSV does not say which setup returned each listing or at which
-rank, so raters are not biased by either setup (the ranks stay in the run files).
+For each pooled listing, the display fields and the reviews and POIs that best match the topic's query are fetched
+from the setup with nested documents (setup 2), through Solr's [subquery] transformer (child_params in
+solr_query.py), so the raters see the evidence of each listing next to it. The query of each topic is read from its
+query file, scripts/queries/<qid>.<setup>.json.
+
+Usage: python scripts/make_pool.py [--k 50] [--children 3] [--extra-runs "runs/tie/*.run"]
+                                   [--tfidf-depth 200] [--tfidf-n 10]
+Writes evaluation/pool.csv, with one row per (qid, docid), one relevance column per rater, the final decision and
+notes. Rows are sorted by docid, and the CSV does not say which run returned each listing, at which rank or
+whether it came from the tf-idf step, so raters are not biased; that is in evaluation/pool_sources.csv.
 """
 import argparse
 import csv
+import glob
 import json
+import re
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -35,32 +46,71 @@ def read_run(path):
     return ranks
 
 
+def read_topics(path):
+    """qid -> title and description of docs/topics/topics.trec."""
+    text = Path(path).read_text(encoding="utf-8")
+    topics = {}
+    for top in re.findall(r"<top>(.*?)</top>", text, re.S):
+        qid = re.search(r"<num>\s*Number:\s*(\S+)", top).group(1)
+        title = re.search(r"<title>(.*)", top).group(1).strip()
+        desc = re.search(r"<desc>\s*Description:(.*)", top).group(1).strip()
+        topics[qid] = f"{title} {desc}"
+    return topics
+
+
+def solr_select(solr, config, params):
+    body = urllib.parse.urlencode({**params, "wt": "json"}, doseq=True).encode()
+    req = urllib.request.Request(f"{solr}/{config['core']}/select", body,
+                                 {"Content-Type": "application/x-www-form-urlencoded"})
+    return json.loads(urllib.request.urlopen(req, timeout=300).read())["response"]["docs"]
+
+
 def fetch_metadata(solr, config, docids, query=None, children=0):
     """Display fields of the given listings, from the core of `config`. With a query and children > 0, also the
     `children` reviews and POIs of each listing that best match it, ranked by score ([subquery])."""
-    params = {"q": "{!terms f=id}" + ",".join(docids), "fq": "doc_type:listing",
-              "fl": FIELDS, "rows": len(docids), "wt": "json"}
+    params = {"q": "{!terms f=id}" + ",".join(docids), "fq": "doc_type:listing", "fl": FIELDS, "rows": len(docids)}
     if query and children:
         sub, fl = child_params(config, query, children)
         params.update(sub)
         params["fl"] = ",".join([FIELDS, *fl])
-    body = urllib.parse.urlencode(params, doseq=True).encode()
-    req = urllib.request.Request(f"{solr}/{config['core']}/select", body,
-                                 {"Content-Type": "application/x-www-form-urlencoded"})
-    docs = json.loads(urllib.request.urlopen(req, timeout=300).read())["response"]["docs"]
-    return {d["id"]: d for d in docs}
+    return {d["id"]: d for d in solr_select(solr, config, params)}
 
 
-def build_pool(names, runs, k):
-    pool = defaultdict(dict)
-    # qid -> docid -> {setup_name: rank}
-    for name, run in zip(names, runs):
+def build_pool(runs, k):
+    """qid -> docid -> set of the runs that have it in their top k."""
+    pool = defaultdict(lambda: defaultdict(set))
+    for name, run in runs.items():
         for qid, docs in run.items():
             for docid, rank in docs.items():
                 if rank <= k:
-                    # add the rank of this docid for this setup to the pool for this qid
-                    pool[qid].setdefault(docid, {})[name] = rank
+                    pool[qid][docid].add(name)
     return pool
+
+
+def tfidf_candidates(solr, config, runs, pool, topics, k, depth, n):
+    """The n listings of each need, ranked k+1..depth in the main runs and not pooled yet, that are most similar
+    to the topic by tf-idf over their name and description: qid -> [(docid, score)]."""
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import linear_kernel
+
+    chosen = {}
+    for qid in sorted(pool):
+        cands = sorted({d for run in runs.values() for d, r in run.get(qid, {}).items()
+                        if k < r <= depth and d not in pool[qid]})
+        if not cands or qid not in topics:
+            chosen[qid] = []
+            continue
+        docs = solr_select(solr, config, {"q": "{!terms f=id}" + ",".join(cands), "fq": "doc_type:listing",
+                                          "fl": "id,name,description", "rows": len(cands)})
+        texts = {d["id"]: f"{d.get('name', '')} {d.get('description', '')}" for d in docs}
+        ids = [c for c in cands if c in texts]
+        vec = TfidfVectorizer(stop_words="english", sublinear_tf=True)
+        matrix = vec.fit_transform([texts[c] for c in ids] + [topics[qid]])
+        scores = linear_kernel(matrix[-1], matrix[:-1]).ravel()  # cosine: the rows are L2-normalised
+        ranked = sorted(zip(ids, scores), key=lambda x: -x[1])
+        chosen[qid] = [(d, float(s)) for d, s in ranked[:n] if s > 0]
+        print(f"{qid}: {len(cands)} results ranked {k + 1}-{depth} not in the pool; tf-idf adds {len(chosen[qid])}")
+    return chosen
 
 
 def children_cells(d):
@@ -75,18 +125,27 @@ def children_cells(d):
 
 def write_pool(path, pool, meta):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    # write the pool to a CSV file with the specified columns
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "listing_url",
-                    "matching_reviews", "top_reviews", "matching_pois", "top_pois", *RATERS, "final"])
+                    "matching_reviews", "top_reviews", "matching_pois", "top_pois", *RATERS, "final", "notes"])
         for qid in sorted(pool):
-            print(f"{qid}: {len(pool[qid])} unique documents in the pool")
             for docid in sorted(pool[qid]):
                 d = meta.get(qid, {}).get(docid, {})
                 w.writerow([qid, docid, d.get("name", ""), d.get("neighbourhood_cleansed", ""),
                             d.get("price", ""), d.get("accommodates", ""), d.get("listing_url", ""),
-                            *children_cells(d), *[""] * (len(RATERS) + 1)])
+                            *children_cells(d), *[""] * (len(RATERS) + 2)])
+
+
+def write_sources(path, pool, tfidf):
+    scores = {(q, d): s for q, picks in tfidf.items() for d, s in picks}
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["qid", "docid", "sources", "tfidf_score"])
+        for qid in sorted(pool):
+            for docid in sorted(pool[qid]):
+                s = scores.get((qid, docid))
+                w.writerow([qid, docid, ";".join(sorted(pool[qid][docid])), "" if s is None else f"{s:.4f}"])
 
 
 def main():
@@ -96,18 +155,35 @@ def main():
                     help="reviews and POIs shown per listing, the ones that best match the query (0: none)")
     ap.add_argument("--setup", nargs="+", default=["configs/setup1.json", "configs/setup2.json"])
     ap.add_argument("--runs", nargs="+", default=["runs/setup1.run", "runs/setup2.run"])
+    ap.add_argument("--extra-runs", nargs="*", default=[],
+                    help="more runs (or glob patterns, e.g. \"runs/tie/*.run\") whose top k is also pooled")
+    ap.add_argument("--tfidf-depth", type=int, default=200, help="last rank of the main runs scored by tf-idf")
+    ap.add_argument("--tfidf-n", type=int, default=10, help="listings added per need by tf-idf (0: none)")
+    ap.add_argument("--topics", default="docs/topics/topics.trec")
     ap.add_argument("--queries", default="scripts/queries", help="folder of the query files <qid>.<setup>.json")
     ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
     ap.add_argument("--out", default="evaluation/pool.csv")
     args = ap.parse_args()
+    solr = args.solr.rstrip("/")
 
     configs = [json.loads(Path(p).read_text(encoding="utf-8")) for p in args.setup]
-    names = [c["setup"] for c in configs]
-    pool = build_pool(names, [read_run(p) for p in args.runs], args.k)
+    main_runs = {Path(p).stem: read_run(p) for p in args.runs}
+    extra = sorted({p for pattern in args.extra_runs for p in (glob.glob(pattern) or [pattern])})
+    runs = {**main_runs, **{Path(p).stem: read_run(p) for p in extra}}
+    pool = build_pool(runs, args.k)
+    top_k = {qid: len(docs) for qid, docs in pool.items()}
 
     # Fields and children come from the setup with nested reviews and POIs; the listing fields are the same in
     # every core, so a setup without children only loses the evidence columns
     source = next((c for c in configs if c["nested"]["reviews"] or c["nested"]["pois"]), configs[0])
+    tfidf = {}
+    if args.tfidf_n:
+        tfidf = tfidf_candidates(solr, source, main_runs, pool, read_topics(args.topics), args.k,
+                                 args.tfidf_depth, args.tfidf_n)
+        for qid, picks in tfidf.items():
+            for docid, _ in picks:
+                pool[qid][docid].add("tfidf")
+
     meta = {}
     for qid, docs in pool.items():
         query_file = Path(args.queries) / f"{qid.lower()}.{source['setup']}.json"
@@ -115,12 +191,17 @@ def main():
         if query is None and args.children:
             print(f"{qid}: no {query_file}, so no reviews or POIs are shown")
         try:
-            meta[qid] = fetch_metadata(args.solr.rstrip("/"), source, sorted(docs), query, args.children)
+            meta[qid] = fetch_metadata(solr, source, sorted(docs), query, args.children)
         except urllib.error.HTTPError as e:
             raise SystemExit(f"{source['setup']}: {e}\n{e.read().decode()[:1500]}")
 
+    for qid in sorted(pool):
+        print(f"{qid}: {len(pool[qid])} listings to judge ({top_k[qid]} from the top {args.k} of "
+              f"{len(runs)} runs, {len(pool[qid]) - top_k[qid]} from tf-idf)")
     write_pool(args.out, pool, meta)
-    print(f"wrote {args.out}")
+    sources = str(Path(args.out).with_name("pool_sources.csv"))
+    write_sources(sources, pool, tfidf)
+    print(f"wrote {args.out} and {sources}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
-  "description": "IN5: Elevator mentioned in the description/amenities and not reported broken.",
+  "description": "IN4: Elevator mentioned in the description/amenities and not reported broken. (setup 1: only listing fields, no POIs or reviews.)",
   "query": "apartment with a functioning elevator",
   "filter": [
     "doc_type:listing"

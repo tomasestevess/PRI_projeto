@@ -21,7 +21,7 @@ AIRBNB_porto  := portugal/norte/porto
 AIRBNB_lisboa := portugal/lisbon/lisbon
 BBOX_porto    := 40.76,-8.79,41.46,-8.10
 BBOX_lisboa   := 38.67,-9.5,39.31,-8.85
-QUERY_IDS     := 1 2 3 5
+QUERY_IDS     := 1 2 3 4
 
 AIRBNB := https://data.insideairbnb.com
 FILES  := $(foreach c,$(CITIES),$(addprefix $(RAW)/airbnb_$(c)/,listings.csv.gz reviews.csv.gz neighbourhoods.geojson) $(RAW)/osm/pois_$(c).json) $(RAW)/wikipedia/articles.jsonl
@@ -35,7 +35,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -122,6 +122,16 @@ run-queries: check-queries solr-up
 			$(PYTHON) scripts/solr_query.py scripts/queries/in$$n.$$s.json --setup configs/$$s.json --trec runs/$$s.run || exit 1; \
 		done; \
 	done
+
+# Ablation study of the eDisMax tie: both setups, all needs, tie 0 to 1 (runs/tie/ and evaluation/tie_ablation.csv).
+# With judgements, add ARGS="--qrels evaluation/qrels.txt" for P@10, P@50 and MAP per tie value
+tie-ablation: check-queries solr-up
+	$(PYTHON) scripts/tie_ablation.py $(ARGS)
+
+# Evaluation pool: top 50 of the runs and of the tie variants, plus 10 listings per need chosen by tf-idf among
+# the results ranked 51-200 (evaluation/pool.csv, to judge, and evaluation/pool_sources.csv)
+pool: run-queries tie-ablation
+	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run"
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar
