@@ -4,7 +4,7 @@ Each pooled listing needs a single decision, and any rater can judge any need. A
 no rater has judged yet (it reads every evaluation/judgements_*.csv, so pull the others' files first), one at a time,
 need by need, in a random order that is fixed per rater. To split the work, give each rater different needs with
 --qids. The screen shows the relevance criteria of the need and, for the listing, what evaluation/pool.csv has:
-name, area, price, capacity, link, and the reviews and POIs that best match the query. It never shows which setup
+name, area, price, capacity, link, and the reviews and POIs with words of the query (best first). It never shows which setup
 returned the listing or at which rank.
 
 Answers are saved after each one in evaluation/judgements_<rater>.csv (qid, docid, rel, note, time), so the rater
@@ -22,6 +22,7 @@ Commands (type and press Enter):
   h           help                              q   quit (answers are already saved)
 
 Usage: python scripts/judge.py --rater A [--qids IN1 IN3] [--pool evaluation/pool.csv]   (default: every need)
+       python scripts/judge.py --rater A --recheck     (go again through this rater's 0 answers)
 """
 import argparse
 import csv
@@ -39,6 +40,8 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from solr_query import EVIDENCE, content_words, word_pattern  # noqa: E402
 FIELDS = ["qid", "docid", "rel", "note", "time"]
 
 
@@ -49,6 +52,17 @@ def width():
 def wrap(text, indent="  "):
     return "\n".join(textwrap.fill(p, width(), initial_indent=indent, subsequent_indent=indent)
                      for p in str(text).split("\n") if p.strip())
+
+
+def highlight(text, words):
+    """Marks the words of the query in the text (bold yellow; *word* with NO_COLOR set). A word matches by its first
+    letters, so "check" also marks "checked" and "arrival" marks "arriving"."""
+    pattern = word_pattern(words)
+    if not pattern:
+        return text
+    if os.environ.get("NO_COLOR"):
+        return pattern.sub(lambda m: f"*{m.group(0)}*", text)
+    return pattern.sub(lambda m: f"\033[1;33m{m.group(0)}\033[0m", text)
 
 
 def criteria(path):
@@ -78,7 +92,7 @@ def save(path, judgements):
 class Solr:
     def __init__(self, url, config):
         self.url, self.core = url.rstrip("/"), config["core"]
-        self.review_q = config["query"]["params"].get("review_q", "{!edismax qf=comments_en v=$user_q}")
+        self.review_q = EVIDENCE["review_q"]  # any content word of the query, best match first
 
     def reviews(self, docid, params):
         params = {"fq": ["doc_type:review", "{!term f=_nest_parent_}" + docid], "fl": "date,comments_en",
@@ -90,14 +104,14 @@ class Solr:
         return r["numFound"], r["docs"]
 
 
-def show_reviews(title, found, docs):
+def show_reviews(title, found, docs, words=()):
     print(f"\n{title}: {found} found")
     for d in docs:
-        print(wrap(f"[{d.get('date', '')[:10]}] {d.get('comments_en', '')}", "    "))
+        print(highlight(wrap(f"[{d.get('date', '')[:10]}] {d.get('comments_en', '')}", "    "), words))
         print()
 
 
-def screen(row, pos, total, rater, crit, current):
+def screen(row, pos, total, rater, crit, current, words=()):
     os.system("cls" if os.name == "nt" else "clear")
     qid = row["qid"]
     print(f"Rater {rater} · {qid} · listing {pos} of {total}" + (f" · current answer: {current}" if current else ""))
@@ -107,10 +121,18 @@ def screen(row, pos, total, rater, crit, current):
     print(f"\n{row['name']}")
     print(f"  {row['neighbourhood_cleansed']} · {row['price']} € per night · {row['accommodates']} guests")
     print(f"  {row['listing_url']}")
-    print(f"\nReviews that best match the query ({row['matching_reviews'] or 0} match):")
-    print(wrap(row["top_reviews"]) if row["top_reviews"] else "  (none)")
-    print(f"\nPOIs that best match the query ({row['matching_pois'] or 0} match):")
-    print(wrap(row["top_pois"]) if row["top_pois"] else "  (none)")
+    print("\nDescription, sentences with words of the query:")
+    print(highlight(wrap(row["description_matches"]), words) if row.get("description_matches") else "  (none)")
+    print("\nAmenities with words of the query:")
+    print(highlight(wrap(row["amenities_matches"]), words) if row.get("amenities_matches") else "  (none)")
+    total = f"; {row['number_of_reviews']} reviews on Airbnb" if row.get("number_of_reviews") else ""
+    print(f"\nReviews with words of the query, best first ({row['matching_reviews'] or 0} match{total}):")
+    print(highlight(wrap(row["top_reviews"]), words) if row["top_reviews"] else "  (none)")
+    if row.get("condition_pois"):
+        print("\nPOIs that meet the need's condition (as in the setup 2 query), nearest first:")
+        print(wrap(row["condition_pois"]))
+    print(f"\nPOIs with words of the query, best first ({row['matching_pois'] or 0} match):")
+    print(highlight(wrap(row["top_pois"]), words) if row["top_pois"] else "  (none)")
 
 
 def main():
@@ -125,6 +147,8 @@ def main():
     ap.add_argument("--setup", default="configs/setup2.json", help="setup used to fetch more reviews")
     ap.add_argument("--queries", default="scripts/queries")
     ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
+    ap.add_argument("--recheck", action="store_true",
+                    help="go again through the listings this rater judged not relevant (0), to confirm or change them")
     args = ap.parse_args()
 
     rater = args.rater.upper()
@@ -153,8 +177,14 @@ def main():
     solr = Solr(args.solr, config)
     query_text = {q: json.loads((Path(args.queries) / f"{q.lower()}.{config['setup']}.json")
                                 .read_text(encoding="utf-8"))["query"] for q in qids}
+    query_words = {q: content_words(text).split() for q, text in query_text.items()}
 
-    i = next((k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements), len(order))
+    if args.recheck:
+        order = [r for r in order if judgements.get((r["qid"], r["docid"]), {}).get("rel") == "0"]
+        if not order:
+            sys.exit("no listings judged 0 by this rater")
+    i = 0 if args.recheck else next((k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements),
+                                    len(order))
     message = f"{len(others)} listings already judged by other raters are skipped" if others else ""
     while True:
         if i >= len(order):
@@ -169,7 +199,8 @@ def main():
         done = sum(1 for r in order if (r["qid"], r["docid"]) in judgements)
         cur = judgements.get(key)
         screen(row, i + 1, len(order), rater, f"{row['qid']}: {crit.get(row['qid'], '(no criteria found)')}",
-               f"{cur['rel']}{' (' + cur['note'] + ')' if cur and cur['note'] else ''}" if cur else "")
+               f"{cur['rel']}{' (' + cur['note'] + ')' if cur and cur['note'] else ''}" if cur else "",
+               query_words[row["qid"]])
         print(f"\n[{done}/{len(order)} judged]  1 relevant · 0 not relevant · ? not sure · n note · r recent · "
               f"m more · f <words> · o open · b back · s skip · q quit")
         if message:
@@ -206,17 +237,18 @@ def main():
                 webbrowser.open(row["listing_url"])
             elif cmd == "r":
                 show_reviews("Most recent reviews", *solr.reviews(row["docid"], {"q": "*:*", "sort": "date desc",
-                                                                               "rows": 5}))
+                                                                               "rows": 5}), query_words[row["qid"]])
                 input("Enter to go back ")
             elif cmd == "m":
                 show_reviews("Reviews that match the query", *solr.reviews(
-                    row["docid"], {"q": solr.review_q, "user_q": query_text[row["qid"]], "rows": 10}))
+                    row["docid"], {"q": solr.review_q, "uq": content_words(query_text[row["qid"]]), "rows": 10}),
+                    query_words[row["qid"]])
                 input("Enter to go back ")
             elif cmd.startswith("f "):
                 words = cmd[2:].strip()
                 show_reviews(f"Reviews with {words!r}", *solr.reviews(
                     row["docid"], {"q": "{!edismax qf=comments_en mm=1 v=$words}", "words": words,
-                                   "sort": "date desc", "rows": 8}))
+                                   "sort": "date desc", "rows": 8}), words.split())
                 input("Enter to go back ")
             elif cmd == "h":
                 print(__doc__)

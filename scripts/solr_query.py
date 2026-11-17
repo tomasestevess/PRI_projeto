@@ -16,6 +16,7 @@ Usage: python scripts/solr_query.py <query.json> --setup configs/setup1.json con
 """
 import argparse
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -29,16 +30,45 @@ CHILDREN = {"top_reviews": ("review", "review_q", "id,date,lang,comments_en,scor
             "top_pois": ("poi", "poi_text", "id,poi_name,category,type,distance_m,wikipedia_title,score")}
 
 
-def child_params(config, query, n):
+# Looser child queries to show the evidence of a listing to a rater (evidence=True): any content word of the query
+# (mm=1, stop words removed first, as POI names are analysed without stop words), best match first
+EVIDENCE = {"review_q": "{!edismax qf='comments_en' mm=1 v=$uq}",
+            "poi_text": "{!edismax qf='poi_name^2 wikipedia_title^2 wikipedia_text' mm=1 v=$uq}"}
+
+
+# Words that almost every listing or review has, so they are no evidence for a need
+GENERIC = {"apartment", "apartments", "flat", "place", "stay", "porto", "lisbon", "lisboa"}
+
+
+def content_words(text):
+    """The words of a query that are evidence: without English stop words and GENERIC words
+    ("apartment with a functioning elevator" -> "functioning elevator")."""
+    from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+    return " ".join(w for w in re.findall(r"[^\W\d_]+", text)
+                    if w.lower() not in ENGLISH_STOP_WORDS and w.lower() not in GENERIC)
+
+
+def word_pattern(words):
+    """A regex for the given words matched by their first letters, so "check" also finds "checked" and "arrival"
+    finds "arriving" (None without words)."""
+    stems = [w.lower()[:min(len(w), max(4, len(w) - 2))] for w in words if len(w) > 2]
+    return re.compile(r"\b(?:" + "|".join(map(re.escape, stems)) + r")\w*", re.I) if stems else None
+
+
+def child_params(config, query, n, evidence=False):
     """The [subquery] parameters that return the n best matching children of each listing, and their fl entries.
-    Subquery parameters lose their prefix inside the subquery and do not see the top-level ones, so the query
-    text is passed again as `<name>.uq` and the setup's child query refers to it as $uq instead of $user_q."""
+    By default the child queries are the setup's, so the children shown are the ones that count in the score; with
+    evidence=True they are the looser EVIDENCE queries. Subquery parameters lose their prefix inside the subquery and
+    do not see the top-level ones, so the query text is passed again as `<name>.uq` and the child query refers to it
+    as $uq instead of $user_q."""
     setup_params = config["query"]["params"]
     params, fl = {}, []
     for name, (doc_type, key, fields) in CHILDREN.items():
         if key not in setup_params:  # setup without nested documents of this kind
             continue
-        params.update({f"{name}.q": setup_params[key].replace("$user_q", "$uq"), f"{name}.uq": query["query"],
+        child_q = EVIDENCE[key] if evidence else setup_params[key].replace("$user_q", "$uq")
+        text = content_words(query["query"]) if evidence else query["query"]
+        params.update({f"{name}.q": child_q, f"{name}.uq": text,
                        f"{name}.fq": ["{!term f=_nest_parent_ v=$row.id}", f"doc_type:{doc_type}"],
                        f"{name}.fl": fields, f"{name}.rows": n})
         fl.append(f"{name}:[subquery]")

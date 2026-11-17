@@ -30,11 +30,12 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
-from solr_query import child_params
+from solr_query import child_params, content_words, word_pattern
 
 RATERS = ["rel_A", "rel_B", "rel_C", "rel_D"]
-FIELDS = "id,name,neighbourhood_cleansed,price,accommodates,listing_url"
+FIELDS = "id,name,neighbourhood_cleansed,price,accommodates,number_of_reviews,listing_url,description,amenities"
 REVIEW_CHARS = 600  # longer reviews are cut in the CSV
+CANDIDATES = 5  # children fetched per child shown, as only those with a word of the query are kept
 
 
 def read_run(path):
@@ -67,13 +68,38 @@ def solr_select(solr, config, params):
 
 def fetch_metadata(solr, config, docids, query=None, children=0):
     """Display fields of the given listings, from the core of `config`. With a query and children > 0, also the
-    `children` reviews and POIs of each listing that best match it, ranked by score ([subquery])."""
+    `children` reviews and POIs of each listing with words of the query, best match first ([subquery] with the
+    looser EVIDENCE queries of solr_query.py: the setup's own child queries can hide the evidence a rater needs)."""
     params = {"q": "{!terms f=id}" + ",".join(docids), "fq": "doc_type:listing", "fl": FIELDS, "rows": len(docids)}
     if query and children:
-        sub, fl = child_params(config, query, children)
+        sub, fl = child_params(config, query, children * CANDIDATES, evidence=True)
         params.update(sub)
+        cond = poi_condition(query)
+        if cond:  # the POIs that meet the need's own condition (e.g. a beach within 500 m), nearest first
+            params.update({"near_pois.q": cond, "near_pois.fq": "{!term f=_nest_parent_ v=$row.id}",
+                           "near_pois.fl": "poi_name,type,distance_m", "near_pois.sort": "distance_m asc",
+                           "near_pois.rows": children})
+            fl.append("near_pois:[subquery]")
         params["fl"] = ",".join([FIELDS, *fl])
     return {d["id"]: d for d in solr_select(solr, config, params)}
+
+
+def poi_condition(query):
+    """The POI query of a block join filter of the query file ({!parent ... v='<POI query>'}), or None."""
+    for f in query.get("filter", []):
+        m = re.match(r"\{!parent\b[^}]*\bv='(.*)'\}$", f)
+        if m:
+            return m.group(1)
+    return None
+
+
+def condition_cell(d):
+    """The POIs of a listing that meet the need's POI condition, as text ("" if the need has none)."""
+    near = d.get("near_pois")
+    if near is None:
+        return ""
+    return "\n".join(f"{p.get('poi_name', '')} ({p.get('type', '')}, {p.get('distance_m', 0):.0f} m)"
+                     for p in near.get("docs", [])) or "none"
 
 
 def build_pool(runs, k):
@@ -113,28 +139,45 @@ def tfidf_candidates(solr, config, runs, pool, topics, k, depth, n):
     return chosen
 
 
-def children_cells(d):
-    """Number of matching reviews and POIs of a listing, and the best ones as text, for the CSV."""
+def children_cells(d, words, n):
+    """Number of matching reviews and POIs of a listing, and the n best ones as text, for the CSV. Only reviews
+    that contain a word of the query are kept: Solr's stemming also matches other words with the same stem
+    ("functioning" and "functional"), which are no evidence."""
+    pattern = word_pattern(words)
+    keep = (lambda text: bool(pattern.search(text))) if pattern else (lambda text: True)
     reviews, pois = d.get("top_reviews", {}), d.get("top_pois", {})
-    review_text = "\n\n".join(f"[{r.get('date', '')[:10]}] {r.get('comments_en', '')[:REVIEW_CHARS]}"
-                              for r in reviews.get("docs", []))
-    poi_text = "\n".join(f"{p.get('poi_name', '')} ({p.get('type', '')}, {p.get('distance_m', 0):.0f} m)"
-                         for p in pois.get("docs", []))
+    review_text = "\n\n".join([f"[{r.get('date', '')[:10]}] {r.get('comments_en', '')[:REVIEW_CHARS]}"
+                               for r in reviews.get("docs", []) if keep(r.get("comments_en", ""))][:n])
+    # POIs are not filtered: many match through the (Portuguese) text of their Wikipedia article, not their name
+    poi_text = "\n".join([f"{p.get('poi_name', '')} ({p.get('type', '')}, {p.get('distance_m', 0):.0f} m)"
+                          for p in pois.get("docs", [])][:n])
     return [reviews.get("numFound", ""), review_text, pois.get("numFound", ""), poi_text]
 
 
-def write_pool(path, pool, meta):
+def text_cells(d, words):
+    """The sentences of the description and the amenities of a listing that have words of the query."""
+    pattern = word_pattern(words)
+    if not pattern:
+        return ["", ""]
+    sentences = re.split(r"(?<=[.!?])\s+", d.get("description", ""))
+    return [" [...] ".join(s for s in sentences if pattern.search(s)),
+            "; ".join(a for a in d.get("amenities", []) if pattern.search(a))]
+
+
+def write_pool(path, pool, meta, words, n):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "listing_url",
-                    "matching_reviews", "top_reviews", "matching_pois", "top_pois", *RATERS, "final", "notes"])
+        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "number_of_reviews",
+                    "listing_url", "description_matches", "amenities_matches",
+                    "matching_reviews", "top_reviews", "matching_pois", "top_pois", "condition_pois", *RATERS, "final", "notes"])
         for qid in sorted(pool):
             for docid in sorted(pool[qid]):
                 d = meta.get(qid, {}).get(docid, {})
                 w.writerow([qid, docid, d.get("name", ""), d.get("neighbourhood_cleansed", ""),
-                            d.get("price", ""), d.get("accommodates", ""), d.get("listing_url", ""),
-                            *children_cells(d), *[""] * (len(RATERS) + 2)])
+                            d.get("price", ""), d.get("accommodates", ""), d.get("number_of_reviews", ""),
+                            d.get("listing_url", ""), *text_cells(d, words.get(qid, [])),
+                            *children_cells(d, words.get(qid, []), n), condition_cell(d), *[""] * (len(RATERS) + 2)])
 
 
 def write_sources(path, pool, tfidf):
@@ -184,10 +227,11 @@ def main():
             for docid, _ in picks:
                 pool[qid][docid].add("tfidf")
 
-    meta = {}
+    meta, words = {}, {}
     for qid, docs in pool.items():
         query_file = Path(args.queries) / f"{qid.lower()}.{source['setup']}.json"
         query = json.loads(query_file.read_text(encoding="utf-8")) if query_file.exists() else None
+        words[qid] = content_words(query["query"]).split() if query else []
         if query is None and args.children:
             print(f"{qid}: no {query_file}, so no reviews or POIs are shown")
         try:
@@ -198,7 +242,7 @@ def main():
     for qid in sorted(pool):
         print(f"{qid}: {len(pool[qid])} listings to judge ({top_k[qid]} from the top {args.k} of "
               f"{len(runs)} runs, {len(pool[qid]) - top_k[qid]} from tf-idf)")
-    write_pool(args.out, pool, meta)
+    write_pool(args.out, pool, meta, words, args.children)
     sources = str(Path(args.out).with_name("pool_sources.csv"))
     write_sources(sources, pool, tfidf)
     print(f"wrote {args.out} and {sources}")
