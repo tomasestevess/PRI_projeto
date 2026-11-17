@@ -35,7 +35,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool judge qrels adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -132,6 +132,16 @@ tie-ablation: check-queries solr-up
 # the results ranked 51-200 (evaluation/pool.csv, to judge, and evaluation/pool_sources.csv)
 pool: run-queries tie-ablation
 	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run"
+
+# Interactive judgement of the pool, one rater at a time: make judge RATER=A (A and B judge IN1 and IN3, C and D
+# judge IN2 and IN4). Answers go to evaluation/judgements_<RATER>.csv after each listing
+judge:
+	$(PYTHON) scripts/judge.py --rater $(RATER) $(ARGS)
+
+# Merges the judgements: agreement and kappa per need, evaluation/disagreements.csv to resolve in
+# evaluation/resolutions.csv, and evaluation/qrels.txt
+qrels:
+	$(PYTHON) scripts/merge_judgements.py
 
 adhoc:
 	# This target is not part of the overall automation, but it can be useful to have something similar

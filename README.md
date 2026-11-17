@@ -39,6 +39,8 @@ make            # collect, process and analyze
 
 **make pool**: builds the evaluation pool (`scripts/make_pool.py`) in `evaluation/pool.csv`: the top 50 of each run and of each tie variant, merged without duplicates, plus 10 listings per need chosen by tf-idf (topic against name and description) among the results ranked 51 to 200. Each row shows the 3 reviews and 3 POIs of the listing that best match the query (Solr `[subquery]`, from setup 2), one relevance column per rater, `final` and `notes`; which run or step added each listing is only in `evaluation/pool_sources.csv`, so the raters stay blind.
 
+**make judge RATER=A**: judges the pool in the terminal, one listing at a time, in a random order fixed per rater (A and B judge IN1 and IN3; C and D judge IN2 and IN4). It shows the criteria of the need and the evidence of the listing, never the setup, rank or other rater; `r`, `m` and `f <words>` fetch more reviews from Solr, `o` opens the listing page. Answers (1, 0, or ? saved as 0 with a note) go to `evaluation/judgements_<rater>.csv` after each one, so it can be stopped and resumed. **make qrels** then compares the two raters of each need (agreement, Cohen's kappa), lists the disagreements in `evaluation/disagreements.csv` (decisions go to `evaluation/resolutions.csv`: qid, docid, final, note) and writes `evaluation/qrels.txt`.
+
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 
 ```
