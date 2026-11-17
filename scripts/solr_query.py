@@ -96,7 +96,8 @@ def main():
                 for rank, d in enumerate(response["docs"], 1):
                     f.write(f"{qid} Q0 {d['id']} {rank} {d.get('score', 0):.6f} {config['setup']}\n")
         print(f"\n== {config['setup']}: {response['numFound']} results for {query['query']!r}")
-        for d in response["docs"]:
+        # With --trec the whole list (up to 1000) goes to the run file; the screen only shows the top 10
+        for d in response["docs"][:10] if args.trec else response["docs"]:
             if args.raw:
                 print(json.dumps(d, ensure_ascii=False))
                 continue

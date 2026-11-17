@@ -33,7 +33,9 @@ make            # collect, process and analyze
 
 **make schema**: defines the schema of both setups without reindexing. Both `make index` and `make schema` write the schema they apply to `configs/schema_setup1.json` and `configs/schema_setup2.json`, in the Solr Schema API format (`add-field-type`, `add-field`), so it can also be applied by hand: `curl -X POST -H 'Content-type:application/json' --data-binary @configs/schema_setup2.json http://localhost:8983/solr/<core>/schema`.
 
-**make run-queries**: starts Solr if needed and runs the in-scope queries IN1, IN2, IN3 and IN5 (`scripts/queries/inN.setupM.json`) on both setups. It writes the TREC run files `runs/setup1.run` and `runs/setup2.run`, one line per result (`qid Q0 docid rank score runid`), with up to 100 results per query. Run `make index` first. The generated files in `runs/` are local outputs and are ignored by Git.
+**make run-queries**: starts Solr if needed and runs the in-scope queries IN1, IN2, IN3 and IN5 (`scripts/queries/inN.setupM.json`) on both setups. It writes the TREC run files `runs/setup1.run` and `runs/setup2.run`, one line per result (`qid Q0 docid rank score runid`), with up to 1000 results per query (the pool only takes the top 50 of each, see `scripts/make_pool.py`). Run `make index` first. The generated files in `runs/` are local outputs and are ignored by Git.
+
+**Evaluation pool**: `python scripts/make_pool.py` (after `make run-queries`) merges the top 50 of each run per topic, without duplicates, into `evaluation/pool.csv`, with one relevance column per rater. Each row also shows the 3 reviews and 3 POIs of the listing that best match the topic's query (Solr `[subquery]`, from setup 2) and how many match; `--k` and `--children` change these numbers.
 
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 

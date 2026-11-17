@@ -7,5 +7,5 @@
     "accommodates:[4 TO *]"
   ],
   "fields": "id,name,city,neighbourhood_cleansed,price,accommodates,review_scores_rating,listing_url,score",
-  "limit": 100
+  "limit": 1000
 }

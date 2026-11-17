@@ -8,5 +8,5 @@
     "{!parent which=$parents v='doc_type:poi AND category:\"leisure\" AND distance_m:[0 TO 500] AND type:(beach OR beach_resort)'}"
   ],
   "fields": "id,name,city,neighbourhood_cleansed,price,accommodates,review_scores_rating,listing_url,score",
-  "limit": 100
+  "limit": 1000
 }

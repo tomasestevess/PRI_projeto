@@ -13,7 +13,7 @@ Every query JSON uses the same keys:
 | `query` | Topic title/query text sent to Solr. Keep it the same in both setup files for a topic. |
 | `filter` | Array of Solr filter queries (`fq`). Every result must be a listing. Setup-specific child filters belong only in setup 2. |
 | `fields` | Comma-separated Solr fields returned for display and run-file generation. Keep paired files consistent. |
-| `limit` | Maximum number of results; use `100` for the TREC runs. |
+| `limit` | Maximum number of results; use `1000` for the TREC runs, the same in every file, so that both setups and all topics are evaluated at the same depth and the precision-recall curve can reach high recall. Only the top 50 of each run are pooled and judged. |
 
 The TREC query ID is derived from the filename: `in3.setup1.json` produces `IN3`. The run file uses the
 six-column format `qid Q0 docid rank score runid`.
@@ -30,7 +30,7 @@ Example:
     "accommodates:[4 TO *]"
   ],
   "fields": "id,name,city,neighbourhood_cleansed,price,accommodates,review_scores_rating,listing_url,score",
-  "limit": 100
+  "limit": 1000
 }
 ```
 
