@@ -31,7 +31,7 @@ make            # collect, process and analyze
 
 **make index**: starts Solr if needed, defines the schema of both setups (see [Solr setups](#solr-setups)) and reindexes everything in each. For a quick test: `make index ARGS="--limit 500"`.
 
-**make run-queries**: starts Solr if needed and runs the queries IN1, IN2, IN3 and IN5 (`scripts/queries/inN.setupM.json`) on both setups. It writes the TREC run files `runs/setup1.run` and `runs/setup2.run`, one line per result (`qid Q0 docid rank score runid`), with up to 100 results per query. Run `make index` first.
+**make run-queries**: starts Solr if needed and runs the in-scope queries IN1, IN2, IN3 and IN5 (`scripts/queries/inN.setupM.json`) on both setups. It writes the TREC run files `runs/setup1.run` and `runs/setup2.run`, one line per result (`qid Q0 docid rank score runid`), with up to 100 results per query. Run `make index` first. The generated files in `runs/` are local outputs and are ignored by Git.
 
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 
@@ -54,6 +54,7 @@ scripts/solr_index.py           defines the Solr schema and indexes the document
 scripts/solr_analysis.py        Solr text analysis and synonyms
 scripts/solr_query.py           runs a query file on one or more setups
 configs/                        one file per Solr setup (schema, analyzers, qf/pf, boosts)
+docs/query-format.md            query JSON format, common filters and block-join templates
 docs/schema.md                  Solr schema and indexing decisions
 docs/report_solr_schema.md      report section: document model, schema, language analysis, setups
 data/raw/                       raw data
@@ -121,5 +122,5 @@ python scripts/solr_index.py --setup configs/setup2.json --reset     # one setup
 python scripts/solr_query.py scripts/queries/rural_quiet.json --setup configs/setup1.json configs/setup2.json
 ```
 
-The query files in `scripts/queries/` only hold the text, filters and fields, so the same file runs on both setups.
+The TREC topic and relevance formats are documented in [docs/topics/topics.trec](docs/topics/topics.trec) and [docs/relevance-criteria.md](docs/relevance-criteria.md). Query files in `scripts/queries/` use one JSON per topic and setup (`inN.setupM.json`); paired files share the same query text and result fields, while filters can differ because setup 1 has no nested reviews or POIs. The JSON format, common filters and reusable block-join templates are in [docs/query-format.md](docs/query-format.md).
 The classification of the fields (searchable, filterable, display only), the language analysis justified with the EDA and a worked example are in [docs/report_solr_schema.md](docs/report_solr_schema.md); the field list of setup 2 is in [docs/schema.md](docs/schema.md).

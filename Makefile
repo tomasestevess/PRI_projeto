@@ -12,6 +12,7 @@ AIRBNB_porto  := portugal/norte/porto
 AIRBNB_lisboa := portugal/lisbon/lisbon
 BBOX_porto    := 40.76,-8.79,41.46,-8.10
 BBOX_lisboa   := 38.67,-9.5,39.31,-8.85
+QUERY_IDS     := 1 2 3 5
 
 AIRBNB := https://data.insideairbnb.com
 FILES  := $(foreach c,$(CITIES),$(addprefix $(RAW)/airbnb_$(c)/,listings.csv.gz reviews.csv.gz neighbourhoods.geojson) $(RAW)/osm/pois_$(c).json) $(RAW)/wikipedia/articles.jsonl
@@ -89,12 +90,12 @@ index: solr-up data/processed/documents.jsonl
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --reset $(ARGS)
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --reset $(ARGS)
 
-# Runs IN1, IN2, IN3 and IN5 on both setups (scripts/queries/inN.setupM.json) and writes the TREC run files runs/setup1.run and runs/setup2.run
+# Runs the in-scope topics on both setups and writes TREC run files in runs/.
 run-queries: solr-up
 	mkdir -p runs
 	for s in setup1 setup2; do \
 		rm -f runs/$$s.run; \
-		for n in 1 2 3 5; do \
+		for n in $(QUERY_IDS); do \
 			$(PYTHON) scripts/solr_query.py scripts/queries/in$$n.$$s.json --setup configs/$$s.json --trec runs/$$s.run || exit 1; \
 		done; \
 	done
