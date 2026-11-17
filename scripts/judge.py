@@ -188,6 +188,15 @@ def main():
             sys.exit("no listings judged 0 by this rater")
     i = 0 if args.recheck else next((k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements),
                                     len(order))
+    def forward(k):
+        """The next listing to show from position k: in normal mode the next one not judged yet (so the rater does not
+        walk again through what is done), in --recheck mode simply the next one."""
+        if args.recheck:
+            return k
+        return next((j for j in range(k, len(order)) if (order[j]["qid"], order[j]["docid"]) not in judgements),
+                    len(order))
+
+    history = []  # positions shown before, for "b"
     message = f"{len(others)} listings already judged by other raters are skipped" if others else ""
     while True:
         if i >= len(order):
@@ -204,7 +213,7 @@ def main():
         screen(row, i + 1, len(order), rater, f"{row['qid']}: {crit.get(row['qid'], '(no criteria found)')}",
                f"{cur['rel']}{' (' + cur['note'] + ')' if cur and cur['note'] else ''}" if cur else "",
                query_words[row["qid"]])
-        print(f"\n[{done}/{len(order)} judged]  1 relevant · 0 not relevant · ? not sure · n note · r recent · "
+        print(f"\n[{done}/{len(order)} judged, {len(order) - done} left]  1 relevant · 0 not relevant · ? not sure · n note · r recent · "
               f"m more · f <words> · o open · b back · s skip · q quit")
         if message:
             print(message)
@@ -225,7 +234,8 @@ def main():
                                    "note": ("? " + note if cmd == "?" and not note.startswith("?") else note),
                                    "time": datetime.now().isoformat(timespec="seconds")}
                 save(out, judgements)
-                i += 1
+                history.append(i)
+                i = forward(i + 1)
             elif cmd == "n":
                 if not cur:
                     message = "answer 1, 0 or ? first"
@@ -233,9 +243,13 @@ def main():
                     cur["note"] = input("note: ").strip()
                     save(out, judgements)
             elif cmd == "b":
-                i = max(0, i - 1)
+                if history:
+                    i = history.pop()
+                else:
+                    message = "no earlier listing in this session"
             elif cmd == "s":
-                i += 1
+                history.append(i)
+                i = forward(i + 1)
             elif cmd == "o":
                 webbrowser.open(row["listing_url"])
             elif cmd == "r":

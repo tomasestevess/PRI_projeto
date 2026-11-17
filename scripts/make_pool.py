@@ -210,6 +210,9 @@ def main():
     ap.add_argument("--queries", default="scripts/queries", help="folder of the query files <qid>.<setup>.json")
     ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
     ap.add_argument("--out", default="evaluation/pool.csv")
+    ap.add_argument("--keep", nargs="*", default=[],
+                    help="earlier pool or pool_sources CSVs whose listings stay in the pool (e.g. after a setup change, "
+                         "so the earlier runs can still be evaluated on the same judgements)")
     args = ap.parse_args()
     solr = args.solr.rstrip("/")
 
@@ -230,6 +233,15 @@ def main():
         for qid, picks in tfidf.items():
             for docid, _ in picks:
                 pool[qid][docid].add("tfidf")
+    kept = 0
+    for path in args.keep:
+        with open(path, encoding="utf-8", newline="") as f:
+            for r in csv.DictReader(f):
+                if r["docid"] not in pool[r["qid"]]:
+                    kept += 1
+                pool[r["qid"]][r["docid"]].add("earlier pool")
+    if args.keep:
+        print(f"{kept} listings kept from the earlier pool ({', '.join(args.keep)})")
 
     meta, words = {}, {}
     for qid, docs in pool.items():
@@ -245,7 +257,7 @@ def main():
 
     for qid in sorted(pool):
         print(f"{qid}: {len(pool[qid])} listings to judge ({top_k[qid]} from the top {args.k} of "
-              f"{len(runs)} runs, {len(pool[qid]) - top_k[qid]} from tf-idf)")
+              f"{len(runs)} runs, {len(pool[qid]) - top_k[qid]} from tf-idf or the earlier pool)")
     write_pool(args.out, pool, meta, words, args.children)
     sources = str(Path(args.out).with_name("pool_sources.csv"))
     write_sources(sources, pool, tfidf)

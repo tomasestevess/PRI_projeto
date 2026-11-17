@@ -124,7 +124,7 @@
     "params": {
       "defType": "lucene",
       "q.op": "OR",
-      "q": "_query_:\"{!edismax qf=$qf pf=$pf ps=$ps tie=$tie mm=$mm boost=$boost v=$user_q}\" _query_:\"{!parent which=$parents score=avg v=$review_q}\"^0.5 _query_:\"{!parent which=$parents score=max v=$poi_q}\"^0.3",
+      "q": "_query_:\"{!edismax qf=$qf pf=$pf ps=$ps tie=$tie mm=$mm boost=$boost sow=true v=$user_q}\" _query_:\"{!parent which=$parents score=avg v=$review_q}\"^0.5 _query_:\"{!parent which=$parents score=max v=$poi_q}\"^0.3",
       "parents": "doc_type:listing",
       "qf": "name^3 description^2 host_about^0.5",
       "pf": "name^6 description^4",

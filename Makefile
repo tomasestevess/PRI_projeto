@@ -131,7 +131,7 @@ tie-ablation: check-queries solr-up
 # Evaluation pool: top 50 of the runs and of the tie variants, plus 10 listings per need chosen by tf-idf among
 # the results ranked 51-200 (evaluation/pool.csv, to judge, and evaluation/pool_sources.csv)
 pool: run-queries tie-ablation
-	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run"
+	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run" $(if $(wildcard evaluation/before_sow/pool_sources.csv),--keep evaluation/before_sow/pool_sources.csv)
 
 # Interactive judgement of the pool: make judge RATER=A [ARGS="--qids IN1"]. One decision per listing, any rater can
 # judge any need; listings already judged by others are skipped. Answers go to evaluation/judgements_<RATER>.csv
