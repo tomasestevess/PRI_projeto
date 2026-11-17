@@ -33,7 +33,8 @@ from pathlib import Path
 from solr_query import child_params, content_words, word_pattern
 
 RATERS = ["rel_A", "rel_B", "rel_C", "rel_D"]
-FIELDS = "id,name,neighbourhood_cleansed,price,accommodates,number_of_reviews,listing_url,description,amenities"
+FIELDS = ("id,name,neighbourhood_cleansed,price,accommodates,number_of_reviews,listing_url,description,amenities,"
+          "property_type,bedrooms,beds,review_scores_checkin")
 REVIEW_CHARS = 600  # longer reviews are cut in the CSV
 CANDIDATES = 5  # children fetched per child shown, as only those with a word of the query are kept
 
@@ -168,14 +169,17 @@ def write_pool(path, pool, meta, words, n):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "number_of_reviews",
+        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "property_type", "bedrooms", "beds",
+                    "review_scores_checkin", "number_of_reviews",
                     "listing_url", "description_matches", "amenities_matches",
                     "matching_reviews", "top_reviews", "matching_pois", "top_pois", "condition_pois", *RATERS, "final", "notes"])
         for qid in sorted(pool):
             for docid in sorted(pool[qid]):
                 d = meta.get(qid, {}).get(docid, {})
                 w.writerow([qid, docid, d.get("name", ""), d.get("neighbourhood_cleansed", ""),
-                            d.get("price", ""), d.get("accommodates", ""), d.get("number_of_reviews", ""),
+                            d.get("price", ""), d.get("accommodates", ""), d.get("property_type", ""),
+                            d.get("bedrooms", ""), d.get("beds", ""), d.get("review_scores_checkin", ""),
+                            d.get("number_of_reviews", ""),
                             d.get("listing_url", ""), *text_cells(d, words.get(qid, [])),
                             *children_cells(d, words.get(qid, []), n), condition_cell(d), *[""] * (len(RATERS) + 2)])
 

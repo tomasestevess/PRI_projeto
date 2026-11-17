@@ -120,6 +120,9 @@ def screen(row, pos, total, rater, crit, current, words=()):
     print("=" * width())
     print(f"\n{row['name']}")
     print(f"  {row['neighbourhood_cleansed']} · {row['price']} € per night · {row['accommodates']} guests")
+    if row.get("property_type"):
+        print(f"  {row['property_type']} · {row['bedrooms'] or '?'} bedrooms · {row['beds'] or '?'} beds · "
+              f"check-in rating {row['review_scores_checkin'] or '?'}")
     print(f"  {row['listing_url']}")
     print("\nDescription, sentences with words of the query:")
     print(highlight(wrap(row["description_matches"]), words) if row.get("description_matches") else "  (none)")
