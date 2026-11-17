@@ -1,9 +1,11 @@
 """Interactive relevance judgement of the evaluation pool, in the terminal.
 
-Each pooled listing needs a single decision, and any rater can judge any need. A rater judges the listings that
-no rater has judged yet (it reads every evaluation/judgements_*.csv, so pull the others' files first), one at a time,
-need by need, in a random order that is fixed per rater. To split the work, give each rater different needs with
---qids. The screen shows the relevance criteria of the need and, for the listing, what evaluation/pool.csv has:
+By default each pooled listing needs a single decision, and any rater can judge any need. A rater judges the
+listings that no rater has judged yet (it reads every evaluation/judgements_*.csv, so pull the others' files first),
+one at a time, need by need, in a random order that is fixed per rater. To split the work, give each rater different
+needs with --qids. With --independent every rater judges every listing, ignoring the other raters' files (never open
+them before you finish), so that the agreement between raters can be measured (scripts/agreement.py).
+The screen shows the relevance criteria of the need and, for the listing, what evaluation/pool.csv has:
 name, area, price, capacity, link, and the reviews and POIs with words of the query (best first). It never shows which setup
 returned the listing or at which rank.
 
@@ -22,6 +24,7 @@ Commands (type and press Enter):
   h           help                              q   quit (answers are already saved)
 
 Usage: python scripts/judge.py --rater A [--qids IN1 IN3] [--pool evaluation/pool.csv]   (default: every need)
+       python scripts/judge.py --rater B --independent   (judge every listing, even those judged by other raters)
        python scripts/judge.py --rater A --recheck     (go again through this rater's 0 answers)
 """
 import argparse
@@ -150,6 +153,8 @@ def main():
     ap.add_argument("--setup", default="configs/setup2.json", help="setup used to fetch more reviews")
     ap.add_argument("--queries", default="scripts/queries")
     ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
+    ap.add_argument("--independent", action="store_true",
+                    help="judge every listing, also the ones other raters have judged (their files are not read)")
     ap.add_argument("--recheck", action="store_true",
                     help="go again through the listings this rater judged not relevant (0), to confirm or change them")
     args = ap.parse_args()
@@ -159,14 +164,17 @@ def main():
     with open(args.pool, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
     qids = args.qids or sorted({r["qid"] for r in rows})
-    # one decision per listing: skip what the other raters have already judged
+    # one decision per listing: skip what the other raters have already judged. With --independent nothing is
+    # skipped and the other raters' files are not even read
     others = set()
-    for path in Path(out).parent.glob("judgements_*.csv"):
-        if path.resolve() != Path(out).resolve():
-            others |= set(load(path))
+    if not args.independent:
+        for path in Path(out).parent.glob("judgements_*.csv"):
+            if path.resolve() != Path(out).resolve():
+                others |= set(load(path))
     rows = [r for r in rows if r["qid"] in qids and (r["qid"], r["docid"]) not in others]
     if not rows:
-        sys.exit(f"nothing to judge for {qids} in {args.pool}: already judged by others, or run make pool first")
+        sys.exit(f"nothing to judge for {qids} in {args.pool}: already judged by others (add --independent to judge "
+                 f"them anyway), or run make pool first")
     # random order, the same every time for this rater, need by need
     rng = random.Random(f"judge-{rater}")
     order = []
@@ -188,15 +196,6 @@ def main():
             sys.exit("no listings judged 0 by this rater")
     i = 0 if args.recheck else next((k for k, r in enumerate(order) if (r["qid"], r["docid"]) not in judgements),
                                     len(order))
-    def forward(k):
-        """The next listing to show from position k: in normal mode the next one not judged yet (so the rater does not
-        walk again through what is done), in --recheck mode simply the next one."""
-        if args.recheck:
-            return k
-        return next((j for j in range(k, len(order)) if (order[j]["qid"], order[j]["docid"]) not in judgements),
-                    len(order))
-
-    history = []  # positions shown before, for "b"
     message = f"{len(others)} listings already judged by other raters are skipped" if others else ""
     while True:
         if i >= len(order):
@@ -213,7 +212,7 @@ def main():
         screen(row, i + 1, len(order), rater, f"{row['qid']}: {crit.get(row['qid'], '(no criteria found)')}",
                f"{cur['rel']}{' (' + cur['note'] + ')' if cur and cur['note'] else ''}" if cur else "",
                query_words[row["qid"]])
-        print(f"\n[{done}/{len(order)} judged, {len(order) - done} left]  1 relevant · 0 not relevant · ? not sure · n note · r recent · "
+        print(f"\n[{done}/{len(order)} judged]  1 relevant · 0 not relevant · ? not sure · n note · r recent · "
               f"m more · f <words> · o open · b back · s skip · q quit")
         if message:
             print(message)
@@ -234,8 +233,7 @@ def main():
                                    "note": ("? " + note if cmd == "?" and not note.startswith("?") else note),
                                    "time": datetime.now().isoformat(timespec="seconds")}
                 save(out, judgements)
-                history.append(i)
-                i = forward(i + 1)
+                i += 1
             elif cmd == "n":
                 if not cur:
                     message = "answer 1, 0 or ? first"
@@ -243,13 +241,9 @@ def main():
                     cur["note"] = input("note: ").strip()
                     save(out, judgements)
             elif cmd == "b":
-                if history:
-                    i = history.pop()
-                else:
-                    message = "no earlier listing in this session"
+                i = max(0, i - 1)
             elif cmd == "s":
-                history.append(i)
-                i = forward(i + 1)
+                i += 1
             elif cmd == "o":
                 webbrowser.open(row["listing_url"])
             elif cmd == "r":
@@ -281,3 +275,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    

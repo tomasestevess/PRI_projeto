@@ -39,7 +39,14 @@ make            # collect, process and analyze
 
 **make pool**: builds the evaluation pool (`scripts/make_pool.py`) in `evaluation/pool.csv`: the top 50 of each run and of each tie variant, merged without duplicates, plus 10 listings per need chosen by tf-idf (topic against name and description) among the results ranked 51 to 200. Each row shows the evidence a rater needs: the sentences of the description and the amenities with words of the query; the listing's number of reviews and its 3 reviews and 3 POIs with words of the query, best match first (Solr `[subquery]` on setup 2, with stop words and words such as "apartment" removed, any word enough, and only reviews that really contain one, so the evidence is not hidden by the setup's stricter minimum match); and, for IN1 and IN2, the POIs that meet the need's POI condition of the setup 2 query, nearest first, one relevance column per rater, `final` and `notes`; which run or step added each listing is only in `evaluation/pool_sources.csv`, so the raters stay blind.
 
-**make judge RATER=A**: judges the pool in the terminal, one listing at a time, in a random order fixed per rater. Each listing needs a single decision and any rater can judge any need: listings already judged by another rater (any `evaluation/judgements_*.csv`, so pull first) are skipped, and `ARGS="--qids IN1"` limits a rater to some needs, to split the work. It shows the criteria of the need and the evidence of the listing, never the setup or rank; `r`, `m` and `f <words>` fetch more reviews from Solr, `o` opens the listing page. Answers (1, 0, or ? saved as 0 with a note) go to `evaluation/judgements_<rater>.csv` after each one, so it can be stopped and resumed. The words of the query are highlighted in the reviews and POIs shown, and `ARGS="--recheck"` goes again through the rater's own 0 answers. **make qrels** then merges every rater's file into `evaluation/qrels.txt`, with the number of listings still to judge per need; a listing judged differently by two raters keeps the most recent answer (or the one in `evaluation/resolutions.csv`) and is listed in `evaluation/conflicts.csv`.
+**make judge RATER=A**: judges the pool in the terminal, one listing at a time, in a random order fixed per rater. It shows the criteria of the need and the evidence of the listing, never the setup or rank; `r`, `m` and `f <words>` fetch more reviews from Solr, `o` opens the listing page. Answers (1, 0, or ? saved as 0 with a note) go to `evaluation/judgements_<rater>.csv` after each one, so it can be stopped and resumed. The words of the query are highlighted in the reviews and POIs shown, and `ARGS="--recheck"` goes again through the rater's own 0 answers. There are two ways to use it:
+
+- **Every rater judges everything (the one we use for the agreement):** `make judge RATER=B ARGS="--independent"`. With `--independent` the rater judges every listing of the pool and the script does not read the other raters' files, so the judgements are independent. Do not open the other `evaluation/judgements_*.csv` before you finish, and do not talk to the other raters about the listings (see [docs/relevance-criteria.md](docs/relevance-criteria.md)).
+- **One decision per listing (to split the work):** without `--independent`, listings already judged by another rater (any `evaluation/judgements_*.csv`, so pull first) are skipped, and `ARGS="--qids IN1"` limits a rater to some needs.
+
+**make qrels** merges every rater's file into `evaluation/qrels.txt` (TREC format, `qid 0 docid rel`) and says how many listings are still to judge per need. A listing judged by one rater gets that rater's decision. A listing judged by several raters gets the majority decision. Every listing on which the raters did not all agree is listed in `evaluation/conflicts.csv` (the answer of each rater, the decision kept and how it was reached). A tie (for example 2 against 2) is kept as 0, like a "?", until the raters agree on it and write the decision in `evaluation/resolutions.csv` (columns `qid,docid,final,note`); a decision in that file overrules the majority. Run `make qrels` again after editing `resolutions.csv`.
+
+**make agreement**: the agreement among all the raters per need and overall (`scripts/agreement.py`, `evaluation/agreement.csv`). As every rater judges every listing, it is measured among all of them at once with Fleiss' kappa, which corrects the observed agreement for the agreement expected by chance. For each need, and for all the needs together (`ALL`), it gives the number of listings judged by every rater, the share of them on which every rater gave the same answer (`all_agree`), the mean share of pairs of raters that agree (`observed_agreement`) and Fleiss' kappa. It needs the judgements of at least two raters made with `--independent`; a listing that any rater has not judged yet is left out. Kappa is `nan` when all the answers of a need are the same. `ARGS="--pairs"` also writes the percent agreement and Cohen's kappa of every pair of raters (`evaluation/agreement_pairs.csv`), to see if one rater is far from the others.
 
 **make evaluate**: evaluates `runs/setup1.run` and `runs/setup2.run` against `evaluation/qrels.txt` with trec_eval's definitions (listings not in the qrels count as not relevant): P@50, AP and MAP, the 11-point interpolated precision-recall curve and its area (AUC). Writes `evaluation/metrics.csv` and the curves in `evaluation/figures/` (one per need and the mean, both setups in each, PNG and PDF).
 
@@ -63,10 +70,20 @@ docker-compose.yml              Solr container (make solr-up, make solr-down)
 scripts/solr_index.py           defines the Solr schema and indexes the documents (make index)
 scripts/solr_analysis.py        Solr text analysis and synonyms
 scripts/solr_query.py           runs a query file on one or more setups
+scripts/check_queries.py        validates the topics, the query files and the run files (make check-queries, make check-runs)
+scripts/tie_ablation.py         ablation of the eDisMax tie (make tie-ablation)
+scripts/make_pool.py            builds the evaluation pool (make pool)
+scripts/judge.py                interactive relevance judgement of the pool (make judge)
+scripts/merge_judgements.py     merges the raters' judgements into the qrels (make qrels)
+scripts/agreement.py            agreement among the raters (make agreement)
+scripts/evaluate.py             P@50, AP, MAP and precision-recall curves (make evaluate)
 configs/                        one file per Solr setup (schema, analyzers, qf/pf, boosts) and the generated
                                 Solr schema of each (schema_setup1.json, schema_setup2.json)
 docs/query-format.md            query JSON format, common filters and block-join templates
 docs/schema.md                  Solr schema and indexing decisions
+docs/relevance-criteria.md      relevance criteria of each information need
+docs/tie-ablation.md            ablation of the eDisMax tie
+evaluation/                     pool, judgements of each rater, qrels, conflicts, agreement and metrics
 docs/report_solr_schema.md      report section: document model, schema, language analysis, setups
 data/raw/                       raw data
 data/processed/                 processed data

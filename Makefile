@@ -35,7 +35,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool judge qrels evaluate adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries tie-ablation pool judge qrels agreement evaluate adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -131,10 +131,11 @@ tie-ablation: check-queries solr-up
 # Evaluation pool: top 50 of the runs and of the tie variants, plus 10 listings per need chosen by tf-idf among
 # the results ranked 51-200 (evaluation/pool.csv, to judge, and evaluation/pool_sources.csv)
 pool: run-queries tie-ablation
-	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run" $(if $(wildcard evaluation/before_sow/pool_sources.csv),--keep evaluation/before_sow/pool_sources.csv)
+	$(PYTHON) scripts/make_pool.py --extra-runs "runs/tie/*.run"
 
 # Interactive judgement of the pool: make judge RATER=A [ARGS="--qids IN1"]. One decision per listing, any rater can
 # judge any need; listings already judged by others are skipped. Answers go to evaluation/judgements_<RATER>.csv
+# With ARGS="--independent" every rater judges every listing (needed to measure agreement), ignoring the others' files.
 judge:
 	$(PYTHON) scripts/judge.py --rater $(RATER) $(ARGS)
 
@@ -142,6 +143,12 @@ judge:
 # evaluation/conflicts.csv)
 qrels:
 	$(PYTHON) scripts/merge_judgements.py
+
+# Agreement among all the raters per need and overall: share of listings with every rater in agreement and Fleiss' kappa
+# (evaluation/agreement.csv); ARGS="--pairs" adds each pair of raters. Needs the judgements of at least two raters made
+# with make judge ARGS="--independent"
+agreement:
+	$(PYTHON) scripts/agreement.py $(ARGS)
 
 # P@50, AP, MAP, 11-point precision-recall curves and AUC of both setups (evaluation/metrics.csv, evaluation/figures/)
 evaluate:
