@@ -1,0 +1,13 @@
+{
+  "description": "TEMPLATE {!child}: the review documents themselves. The text query ranks reviews; {!child} in fq keeps only reviews of listings that pass the listing filters (its v is a PARENT query).",
+  "query": "quiet street, great for families",
+  "params": {
+    "q": "{!edismax qf=comments_en tie=0.1 v=$user_q}"
+  },
+  "filter": [
+    "doc_type:review",
+    "{!child of=$parents v='doc_type:listing AND city:lisboa AND price:[50 TO 150] AND accommodates:[4 TO *]'}"
+  ],
+  "fields": "id,comments_en,lang,date,score",
+  "limit": 10
+}

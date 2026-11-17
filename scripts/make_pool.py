@@ -97,7 +97,7 @@ def main():
     ap.add_argument("--setup", nargs="+", default=["configs/setup1.json", "configs/setup2.json"])
     ap.add_argument("--runs", nargs="+", default=["runs/setup1.run", "runs/setup2.run"])
     ap.add_argument("--queries", default="scripts/queries", help="folder of the query files <qid>.<setup>.json")
-    ap.add_argument("--solr", default="http://localhost:8983/solr")
+    ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
     ap.add_argument("--out", default="evaluation/pool.csv")
     args = ap.parse_args()
 

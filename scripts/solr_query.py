@@ -16,6 +16,9 @@ Usage: python scripts/solr_query.py <query.json> --setup configs/setup1.json con
 """
 import argparse
 import json
+import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -55,7 +58,13 @@ def run(solr, config, query, children=0):
     body = urllib.parse.urlencode(params, doseq=True).encode()
     req = urllib.request.Request(f"{solr}/{config['core']}/select", body,
                                  {"Content-Type": "application/x-www-form-urlencoded"})
-    return json.loads(urllib.request.urlopen(req, timeout=300).read())["response"]
+    for attempt in range(3):  # Solr can reset the connection while it warms up or reloads
+        try:
+            return json.loads(urllib.request.urlopen(req, timeout=300).read())["response"]
+        except (ConnectionError, urllib.error.URLError):
+            if attempt == 2:
+                raise
+            time.sleep(5)
 
 
 def print_children(doc):
@@ -74,10 +83,11 @@ def print_children(doc):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles use cp1252 and fail on names with other characters
     ap = argparse.ArgumentParser()
     ap.add_argument("query", help="query file")
     ap.add_argument("--setup", nargs="+", required=True)
-    ap.add_argument("--solr", default="http://localhost:8983/solr")
+    ap.add_argument("--solr", default="http://127.0.0.1:8983/solr")
     ap.add_argument("--raw", action="store_true", help="print the JSON response")
     ap.add_argument("--children", type=int, default=0, metavar="N",
                     help="also return the N reviews and N POIs of each listing that best match the query")

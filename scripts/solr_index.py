@@ -6,7 +6,7 @@ as nested child documents (see configs/ and docs/report_solr_schema.md).
 The schema that is applied is also written to configs/schema_<setup>.json, in the Schema API format
 (add-field-type, add-field), so the repository always has the exact schema of each core.
 
-Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://localhost:8983/solr]
+Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://127.0.0.1:8983/solr]
                                     [--batch 200] [--limit N] [--reset] [--schema-only]
 """
 import argparse
@@ -179,7 +179,7 @@ def nest(doc, config, translations):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--setup", default="configs/setup2.json", help="configs/setup1.json or configs/setup2.json")
-    ap.add_argument("--solr", default="http://localhost:8983/solr", help="Solr base URL; the core is in the setup")
+    ap.add_argument("--solr", default="http://127.0.0.1:8983/solr", help="Solr base URL; the core is in the setup")
     ap.add_argument("--batch", type=int, default=200)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--reset", action="store_true", help="delete every document before indexing")

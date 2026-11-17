@@ -1,0 +1,15 @@
+{
+  "description": "TEMPLATE {!parent}: listings that have review children matching the query (review_q from configs/setup2.json). Add city/price/capacity filters as needed.",
+  "query": "quiet street, great for families",
+  "params": {
+    "q": "{!parent which=$parents score=avg v=$review_q}"
+  },
+  "filter": [
+    "doc_type:listing",
+    "city:lisboa",
+    "price:[50 TO 150]",
+    "accommodates:[4 TO *]"
+  ],
+  "fields": "id,name,city,price,accommodates,review_scores_rating,listing_url,score",
+  "limit": 10
+}

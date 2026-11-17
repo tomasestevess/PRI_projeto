@@ -1,0 +1,14 @@
+{
+  "description": "TEMPLATE {!child}: the POI documents themselves, for listings that pass the listing filters.",
+  "query": "praia",
+  "params": {
+    "q": "{!edismax qf='poi_name^2 wikipedia_title^2' tie=0.1 v=$user_q}"
+  },
+  "filter": [
+    "doc_type:poi",
+    "distance_m:[0 TO 500]",
+    "{!child of=$parents v='doc_type:listing AND city:lisboa AND accommodates:[4 TO *]'}"
+  ],
+  "fields": "id,poi_name,category,type,distance_m,wikipedia_title,score",
+  "limit": 10
+}

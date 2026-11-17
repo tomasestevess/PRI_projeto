@@ -35,7 +35,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down schema index run-queries adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index check-queries check-runs run-queries adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -105,8 +105,16 @@ index: solr-up data/processed/documents.jsonl
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --reset $(ARGS)
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --reset $(ARGS)
 
+# Validates the topics and the query files
+check-queries:
+	$(PYTHON) scripts/check_queries.py
+
+# Validates the TREC run files written by run-queries
+check-runs:
+	$(PYTHON) scripts/check_queries.py --runs runs/setup1.run runs/setup2.run
+
 # Runs the in-scope topics on both setups and writes TREC run files in runs/.
-run-queries: solr-up
+run-queries: check-queries solr-up
 	mkdir -p runs
 	for s in setup1 setup2; do \
 		rm -f runs/$$s.run; \

@@ -56,10 +56,15 @@ cannot run these joins. In the snippets below, `$parents` is `doc_type:listing`;
 review children and `$poi_q` must match POI children. The existing definitions are in
 `configs/setup2.json` under `query.params`.
 
-| Evidence | Return matching listings with `{!parent}` | Return matching child documents with `{!child}` |
+| Evidence | Return matching listings with `{!parent}` (`v` is a **child** query) | Return matching child documents (`{!child}`: `v` is a **parent** query) |
 |---|---|---|
-| Reviews | `{!parent which=$parents score=avg v=$review_q}` | `{!child of=$parents v=$review_q}` |
-| POIs | `{!parent which=$parents score=max v=$poi_q}` | `{!child of=$parents v=$poi_q}` |
+| Reviews | `{!parent which=$parents score=avg v=$review_q}` | `q={!edismax qf=comments_en v=$user_q}`, `fq=doc_type:review`, `fq={!child of=$parents v='<listing filters>'}` |
+| POIs | `{!parent which=$parents score=max v=$poi_q}` | `q={!edismax qf='poi_name^2 wikipedia_title^2' v=$user_q}`, `fq=doc_type:poi`, `fq={!child of=$parents v='<listing filters>'}` |
+
+Runnable examples of the four cases are in `scripts/queries/templates/`
+(`python scripts/solr_query.py scripts/queries/templates/review_child.setup2.json --setup configs/setup2.json`).
+`{!child of=$parents v=...}` returns the children of the parents that match `v`, so `v` must match listings,
+not reviews or POIs. To rank or restrict the children by their own text, put that in `q` or in a separate `fq`.
 
 The review query should target review fields, for example `comments_en`; the POI query should be constrained
 to `doc_type:poi` and target fields such as `poi_name`, `wikipedia_title` or `wikipedia_text`. To require a
@@ -75,6 +80,6 @@ The reusable form is:
 {!parent which=$parents v='doc_type:poi AND category:"<category>" AND distance_m:[0 TO <meters>] AND type:<poi_type>'}
 ```
 
-`{!parent}` returns the matching listing parents. `{!child}` returns child documents for matched parent
+`{!parent}` returns the matching listing parents. `{!child}` returns the child documents of the matched parent
 blocks, so use it when the caller needs review or POI documents themselves. Keep the top-level
 `doc_type:listing` filter in query JSON files so TREC runs contain listing IDs.
