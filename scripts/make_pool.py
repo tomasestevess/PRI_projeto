@@ -8,7 +8,8 @@ scripts/queries/<qid>.<setup>.json.
 
 Usage: python scripts/make_pool.py [--k 50] [--children 3] --setup configs/setup1.json configs/setup2.json
 Writes evaluation/pool.csv with one row per (qid, docid) and one relevance column per rater.
-Rows are sorted by docid, not by rank, so raters are not biased by the order of either setup.
+Rows are sorted by docid, not by rank, and the CSV does not say which setup returned each listing or at which
+rank, so raters are not biased by either setup (the ranks stay in the run files).
 """
 import argparse
 import csv
@@ -72,22 +73,20 @@ def children_cells(d):
     return [reviews.get("numFound", ""), review_text, pois.get("numFound", ""), poi_text]
 
 
-def write_pool(path, pool, meta, names):
+def write_pool(path, pool, meta):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     # write the pool to a CSV file with the specified columns
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "listing_url",
-                    "matching_reviews", "top_reviews", "matching_pois", "top_pois",
-                    *[f"rank_{n}" for n in names], *RATERS, "final"])
+                    "matching_reviews", "top_reviews", "matching_pois", "top_pois", *RATERS, "final"])
         for qid in sorted(pool):
             print(f"{qid}: {len(pool[qid])} unique documents in the pool")
             for docid in sorted(pool[qid]):
                 d = meta.get(qid, {}).get(docid, {})
                 w.writerow([qid, docid, d.get("name", ""), d.get("neighbourhood_cleansed", ""),
                             d.get("price", ""), d.get("accommodates", ""), d.get("listing_url", ""),
-                            *children_cells(d),
-                            *[pool[qid][docid].get(n, "") for n in names], *[""] * (len(RATERS) + 1)])
+                            *children_cells(d), *[""] * (len(RATERS) + 1)])
 
 
 def main():
@@ -120,7 +119,7 @@ def main():
         except urllib.error.HTTPError as e:
             raise SystemExit(f"{source['setup']}: {e}\n{e.read().decode()[:1500]}")
 
-    write_pool(args.out, pool, meta, names)
+    write_pool(args.out, pool, meta)
     print(f"wrote {args.out}")
 
 
