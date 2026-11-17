@@ -10,3 +10,5 @@ __pycache__/
 .matplotlib
 
 /analysis/notebooks/.matplotlib
+
+/runs

@@ -33,6 +33,8 @@ make            # collect, process and analyze
 
 **make schema**: defines the schema of both setups without reindexing. Both `make index` and `make schema` write the schema they apply to `configs/schema_setup1.json` and `configs/schema_setup2.json`, in the Solr Schema API format (`add-field-type`, `add-field`), so it can also be applied by hand: `curl -X POST -H 'Content-type:application/json' --data-binary @configs/schema_setup2.json http://localhost:8983/solr/<core>/schema`.
 
+**make run-queries**: starts Solr if needed and runs the queries IN1, IN2, IN3 and IN5 (`scripts/queries/inN.setupM.json`) on both setups. It writes the TREC run files `runs/setup1.run` and `runs/setup2.run`, one line per result (`qid Q0 docid rank score runid`), with up to 100 results per query. Run `make index` first.
+
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 
 ```

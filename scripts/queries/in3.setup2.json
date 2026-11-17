@@ -1,0 +1,9 @@
+{
+  "description": "IN3: Easy, smooth check-in late at night; relies almost only on the reviews.",
+  "query": "easy self check-in for a late arrival",
+  "filter": [
+    "doc_type:listing"
+  ],
+  "fields": "id,name,city,neighbourhood_cleansed,price,accommodates,review_scores_rating,listing_url,score",
+  "limit": 100
+}

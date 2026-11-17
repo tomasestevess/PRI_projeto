@@ -40,7 +40,7 @@
 - **Not relevant:** the reviews report problems with keys, codes or a late check-in. Or the host did not answer.
 - **Doubtful:** "Self check-in" is in the amenities but no review talks about it. This is not relevant, because this need relies on the reviews.
 
-## IN4: Accessible stay
+## IN5: Accessible stay
 
 **Query:** "Apartment with a functioning elevator."
 
