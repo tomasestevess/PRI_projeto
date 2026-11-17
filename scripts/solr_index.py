@@ -3,7 +3,7 @@
 Setup 1 indexes the listings alone; setup 2 sends each listing as a parent document with its reviews and pois
 as nested child documents (see configs/ and docs/report_solr_schema.md).
 
-Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://localhost:8983/solr]
+Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://127.0.0.1:8983/solr]
                                     [--batch 200] [--limit N] [--reset]
 """
 import argparse
@@ -161,7 +161,7 @@ def nest(doc, config, translations):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--setup", default="configs/setup2.json", help="configs/setup1.json or configs/setup2.json")
-    ap.add_argument("--solr", default="http://localhost:8983/solr", help="Solr base URL; the core is in the setup")
+    ap.add_argument("--solr", default="http://127.0.0.1:8983/solr", help="Solr base URL; the core is in the setup")
     ap.add_argument("--batch", type=int, default=200)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--reset", action="store_true", help="delete every document before indexing")

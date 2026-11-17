@@ -1,0 +1,14 @@
+{
+  "description": "TEMPLATE {!parent}: listings with a matching POI child. Hard filter: POI category/type within <meters>. Soft ranking: poi_q from configs/setup2.json.",
+  "query": "beach",
+  "params": {
+    "q": "{!parent which=$parents score=max v=$poi_q}"
+  },
+  "filter": [
+    "doc_type:listing",
+    "city:lisboa",
+    "{!parent which=$parents v='doc_type:poi AND category:\"leisure\" AND distance_m:[0 TO 500] AND type:(beach OR beach_resort)'}"
+  ],
+  "fields": "id,name,city,price,accommodates,listing_url,score",
+  "limit": 10
+}
