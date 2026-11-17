@@ -1,0 +1,454 @@
+{
+  "add-field-type": [
+    {
+      "name": "text_multi",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "asciiFolding"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "asciiFolding"
+          }
+        ]
+      }
+    },
+    {
+      "name": "text_en_fold",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "words": "lang/stopwords_en.txt",
+            "ignoreCase": "true",
+            "name": "stop"
+          },
+          {
+            "name": "asciiFolding"
+          },
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "englishPossessive"
+          },
+          {
+            "name": "keywordMarker",
+            "protected": "protwords.txt"
+          },
+          {
+            "name": "porterStem"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "words": "lang/stopwords_en.txt",
+            "ignoreCase": "true",
+            "name": "stop"
+          },
+          {
+            "name": "asciiFolding"
+          },
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "englishPossessive"
+          },
+          {
+            "name": "keywordMarker",
+            "protected": "protwords.txt"
+          },
+          {
+            "name": "porterStem"
+          }
+        ]
+      }
+    },
+    {
+      "name": "text_pt_fold",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "stop",
+            "words": "lang/stopwords_pt.txt",
+            "ignoreCase": "true",
+            "format": "snowball"
+          },
+          {
+            "name": "asciiFolding"
+          },
+          {
+            "name": "portugueseLightStem"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "name": "standard"
+        },
+        "filters": [
+          {
+            "name": "lowercase"
+          },
+          {
+            "name": "stop",
+            "words": "lang/stopwords_pt.txt",
+            "ignoreCase": "true",
+            "format": "snowball"
+          },
+          {
+            "name": "asciiFolding"
+          },
+          {
+            "name": "portugueseLightStem"
+          }
+        ]
+      }
+    }
+  ],
+  "add-field": [
+    {
+      "name": "name",
+      "type": "text_multi",
+      "stored": true
+    },
+    {
+      "name": "description",
+      "type": "text_en_fold",
+      "stored": true
+    },
+    {
+      "name": "host_about",
+      "type": "text_multi",
+      "stored": true
+    },
+    {
+      "name": "wikipedia_title",
+      "type": "text_multi",
+      "stored": true
+    },
+    {
+      "name": "wikipedia_text",
+      "type": "text_pt_fold",
+      "stored": false
+    },
+    {
+      "name": "poi_name",
+      "type": "text_multi",
+      "stored": true
+    },
+    {
+      "name": "comments_en",
+      "type": "text_en_fold",
+      "stored": true
+    },
+    {
+      "name": "doc_type",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "city",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "neighbourhood_cleansed",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "neighbourhood_group_cleansed",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "property_type",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "room_type",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "bathrooms_text",
+      "type": "string",
+      "stored": true,
+      "indexed": false,
+      "docValues": false
+    },
+    {
+      "name": "host_name",
+      "type": "string",
+      "stored": true,
+      "indexed": false,
+      "docValues": false
+    },
+    {
+      "name": "host_location",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "host_is_superhost",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "host_identity_verified",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "has_availability",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "listing_url",
+      "type": "string",
+      "stored": true,
+      "indexed": false,
+      "docValues": false
+    },
+    {
+      "name": "picture_url",
+      "type": "string",
+      "stored": true,
+      "indexed": false,
+      "docValues": false
+    },
+    {
+      "name": "lang",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "stored": true
+    },
+    {
+      "name": "reviewer_name",
+      "type": "string",
+      "stored": true,
+      "indexed": false,
+      "docValues": false
+    },
+    {
+      "name": "amenities",
+      "type": "string",
+      "stored": true,
+      "multiValued": true
+    },
+    {
+      "name": "accommodates",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "number_of_reviews",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "number_of_reviews_ltm",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "number_of_reviews_l30d",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "number_of_reviews_ly",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "availability_30",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "availability_60",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "availability_90",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "availability_365",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "availability_eoy",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "poi_count_500m",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "food_count_500m",
+      "type": "pint",
+      "stored": true
+    },
+    {
+      "name": "listing_id",
+      "type": "plong",
+      "stored": true
+    },
+    {
+      "name": "price",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "bathrooms",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "bedrooms",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "beds",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "minimum_nights",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "reviews_per_month",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "host_listings_count",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_rating",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_accuracy",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_cleanliness",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_checkin",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_communication",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_location",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "review_scores_value",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "distance_m",
+      "type": "pfloat",
+      "stored": true
+    },
+    {
+      "name": "first_review",
+      "type": "pdate",
+      "stored": true
+    },
+    {
+      "name": "last_review",
+      "type": "pdate",
+      "stored": true
+    },
+    {
+      "name": "date",
+      "type": "pdate",
+      "stored": true
+    },
+    {
+      "name": "location",
+      "type": "location",
+      "stored": true
+    },
+    {
+      "name": "_nest_parent_",
+      "type": "string",
+      "indexed": true,
+      "stored": true
+    }
+  ]
+}

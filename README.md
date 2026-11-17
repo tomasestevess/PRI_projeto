@@ -31,6 +31,8 @@ make            # collect, process and analyze
 
 **make index**: starts Solr if needed, defines the schema of both setups (see [Solr setups](#solr-setups)) and reindexes everything in each. For a quick test: `make index ARGS="--limit 500"`.
 
+**make schema**: defines the schema of both setups without reindexing. Both `make index` and `make schema` write the schema they apply to `configs/schema_setup1.json` and `configs/schema_setup2.json`, in the Solr Schema API format (`add-field-type`, `add-field`), so it can also be applied by hand: `curl -X POST -H 'Content-type:application/json' --data-binary @configs/schema_setup2.json http://localhost:8983/solr/<core>/schema`.
+
 To run the complete exploratory analysis and regenerate the CSV tables and PDF figures:
 
 ```
@@ -51,7 +53,8 @@ docker-compose.yml              Solr container (make solr-up, make solr-down)
 scripts/solr_index.py           defines the Solr schema and indexes the documents (make index)
 scripts/solr_analysis.py        Solr text analysis and synonyms
 scripts/solr_query.py           runs a query file on one or more setups
-configs/                        one file per Solr setup (schema, analyzers, qf/pf, boosts)
+configs/                        one file per Solr setup (schema, analyzers, qf/pf, boosts) and the generated
+                                Solr schema of each (schema_setup1.json, schema_setup2.json)
 docs/schema.md                  Solr schema and indexing decisions
 docs/report_solr_schema.md      report section: document model, schema, language analysis, setups
 data/raw/                       raw data
@@ -110,14 +113,15 @@ The documents are indexed in two comparable setups, each defined by one versione
 |---|---|---|
 | Core | `airbnb_s1` | `airbnb_s2` |
 | Documents | listings only | listings with nested reviews and POIs (block join) |
-| Analysis | one simple analyzer | English for the description and the (translated) reviews, Portuguese for Wikipedia, synonyms |
+| Analysis | one simple analyzer | English for the description and the (translated) reviews, Portuguese for Wikipedia (no synonyms: left for M3) |
 | Ranking | edismax on name, description, host_about | the same, plus review and POI evidence and a rating/popularity boost |
 
 ```
 make index                                       # both setups; ARGS="--limit N" for a sample
 python scripts/solr_index.py --setup configs/setup2.json --reset     # one setup
-python scripts/solr_query.py scripts/queries/rural_quiet.json --setup configs/setup1.json configs/setup2.json
+python scripts/solr_query.py <query.json> --setup configs/setup1.json configs/setup2.json
+python scripts/solr_query.py <query.json> --setup configs/setup2.json --children 3   # also the 3 best matching reviews and POIs of each listing ([subquery])
 ```
 
-The query files in `scripts/queries/` only hold the text, filters and fields, so the same file runs on both setups.
+A query file (`<query.json>`) only holds the text (`query`), filters (`filter`), fields (`fields`) and `limit`, so the same file runs on both setups.
 The classification of the fields (searchable, filterable, display only), the language analysis justified with the EDA and a worked example are in [docs/report_solr_schema.md](docs/report_solr_schema.md); the field list of setup 2 is in [docs/schema.md](docs/schema.md).

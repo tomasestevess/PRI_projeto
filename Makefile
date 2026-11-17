@@ -34,7 +34,7 @@ all: collect process analyze
 clean:
 	rm -rf data analysis/figures analysis/tables
 
-.PHONY: all clean collect process translate analyze solr-up solr-down index adhoc
+.PHONY: all clean collect process translate analyze solr-up solr-down schema index adhoc
 # Downloads raw data to data/raw/. Files that already exist are skipped, so reruns resume.
 collect: $(FILES)
 
@@ -93,7 +93,13 @@ solr-up:
 solr-down:
 	docker compose down
 
-# Defines the schema of both setups (configs/) and reindexes everything in each one
+# Defines the schema of both setups in Solr and writes it to configs/schema_setup1.json and schema_setup2.json,
+# without indexing. Only needed after changing a setup without reindexing (e.g. query-side analysis)
+schema: solr-up
+	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --schema-only
+	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --schema-only
+
+# Defines the schema of both setups (configs/, also written to configs/schema_setupN.json) and reindexes everything in each one
 index: solr-up data/processed/documents.jsonl
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup1.json --reset $(ARGS)
 	$(PYTHON) -u scripts/solr_index.py --setup configs/setup2.json --reset $(ARGS)

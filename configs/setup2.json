@@ -9,29 +9,20 @@
   "analysis": [
     {
       "name": "text_multi",
-      "kind": "multi",
-      "synonyms": [
-        "en",
-        "pt"
-      ]
+      "kind": "multi"
     },
     {
       "name": "text_en_fold",
       "kind": "derived",
-      "base": "text_en",
-      "synonyms": "en"
+      "base": "text_en"
     },
     {
       "name": "text_pt_fold",
       "kind": "derived",
-      "base": "text_pt",
-      "synonyms": "pt"
+      "base": "text_pt"
     }
   ],
-  "synonyms": [
-    "en",
-    "pt"
-  ],
+  "synonyms": [],
   "schema": {
     "text": {
       "name": "text_multi",

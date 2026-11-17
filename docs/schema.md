@@ -1,6 +1,6 @@
 # Solr schema
 
-Two cores, one per setup: `airbnb_s1` (listings only) and `airbnb_s2` (listings with reviews and POIs). The fields, types and query parameters are in `configs/setup1.json` and `configs/setup2.json`, applied by `scripts/solr_index.py` and `scripts/solr_analysis.py`. This page describes setup 2, which has every field; setup 1 has only the listing fields, with `text_simple` (standard tokenizer, lowercase, ASCII folding) for the three text fields. See [report_solr_schema.md](report_solr_schema.md) for the reasoning.
+Two cores, one per setup: `airbnb_s1` (listings only) and `airbnb_s2` (listings with reviews and POIs). The fields, types and query parameters are in `configs/setup1.json` and `configs/setup2.json`, applied by `scripts/solr_index.py` and `scripts/solr_analysis.py`. This page describes setup 2, which has every field; setup 1 has only the listing fields, with `text_simple` (standard tokenizer, lowercase, ASCII folding) for the three text fields. See [report_solr_schema.md](report_solr_schema.md) for the reasoning. The schema applied to each core is written to `configs/schema_setup1.json` and `configs/schema_setup2.json` (Schema API format) by `make index` or `make schema`.
 
 Each listing is a parent document, with its reviews and POIs as nested child documents.
 `doc_type` tells them apart: `listing`, `review` or `poi`.
@@ -52,10 +52,12 @@ All 58 fields are stored and single-valued, except where noted. `id` is Solr's b
 
 | Type | Analysis |
 |---|---|
-| `text_multi` | Standard tokenizer, lowercase, ASCII folding. No stemming. English and Portuguese synonyms at query time |
-| `text_en_fold` | Solr's `text_en` plus ASCII folding. English synonyms at query time |
-| `text_pt_fold` | Solr's `text_pt` plus ASCII folding. Portuguese synonyms at query time |
+| `text_multi` | Standard tokenizer, lowercase, ASCII folding. No stemming |
+| `text_en_fold` | Solr's `text_en` plus ASCII folding |
+| `text_pt_fold` | Solr's `text_pt` plus ASCII folding |
 | `text_simple` | Setup 1 only: standard tokenizer, lowercase, ASCII folding |
+
+No setup uses synonyms in M2; the query-time synonym lists in `scripts/solr_analysis.py` are left for M3.
 
 ## Indexing
 

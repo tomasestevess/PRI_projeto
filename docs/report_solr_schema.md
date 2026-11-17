@@ -1,5 +1,7 @@
 # Document model, schema and linguistic analysis
 
+> **Update (M2):** query-time synonyms are left for M3. `configs/setup2.json` no longer lists them, so neither setup uses synonyms. The synonym lists below stay in `scripts/solr_analysis.py` for M3, and the observations in sections 4 and 5 that depend on them (e.g. apartamento = flat) were made before this change. The two example queries used in sections 2, 4, 5 and 6 (`apartments_ribeira.json`, `rural_quiet.json`) were later removed from the repository; their results are kept here only as a record.
+
 ## 1. Document model
 
 The collection joins three sources: Inside Airbnb (listings, reviews), OpenStreetMap (POIs) and Wikipedia
@@ -77,7 +79,7 @@ reviews, per document.
 
 | Field | Setup 1 | Setup 2 | Justification |
 |---|---|---|---|
-| `name`, `host_about` | `text_simple` | `text_multi` | mixed languages: a stemmer for one language damages the others. Setup 2 adds query-time synonyms (en, pt) |
+| `name`, `host_about` | `text_simple` | `text_multi` | mixed languages: a stemmer for one language damages the others |
 | `description` | `text_simple` | `text_en_fold` | 99 % English: English stop words and stemming are safe |
 | `comments_en` | – | `text_en_fold` | the approach is to search the reviews in English only. 57.3 % are already English; the six other main languages (fr, pt, es, de, it, nl: 39.6 %) are machine-translated to English (`make translate`) and indexed in the same field, so one analyzer with English stemming and synonyms serves 96.9 % of the reviews and a query in English finds what guests wrote in any of them. A review of those languages without a translation yet is skipped |
 | (none) | – | – | the remaining 3.1 % (~75 k reviews, ~80 languages, none above 0.9 %) are **discarded**: they cannot be translated with the six models, no single analyzer would serve them, and they are too few to change the ranking |
@@ -88,7 +90,7 @@ Components of the `<base>_fold` types (`text_en_fold`, `text_pt_fold`, derived f
 - **Accent folding** (`asciiFolding`) after the stop filter and before the stemmer: stop words are still
   recognised with their accents, and a missing or extra accent in the query stops mattering.
 - **Stop words and stemming** are inherited from the Solr type of the language.
-- **Synonyms** (managed resources `syn_<lang>`, query side only, so changing them needs no reindexing):
+- **Synonyms** (left for M3; not used by any M2 setup. Managed resources `syn_<lang>`, query side only, so changing them needs no reindexing):
   quiet/peaceful/calm, apartment/flat, air conditioning/air conditioner/ac, metro/subway, elevator/lift for
   English (the list includes the variants the translations produce), and sossegado/tranquilo/calmo,
   apartamento/flat, ar condicionado/ac for Portuguese. They are inserted right after the first lowercase
@@ -105,7 +107,7 @@ Checked on the running cores:
 |---|---|---|
 | Document model | flat: listings only | listings + nested reviews + nested POIs |
 | Searchable fields | `name`, `description`, `host_about` | those + `comments_en`, `poi_name`, `wikipedia_title`, `wikipedia_text` |
-| Analysis | one simple type (`text_simple`: standard tokenizer, lowercase, ascii folding) | `text_en_fold` (description, reviews), `text_pt_fold` (Wikipedia), `text_multi`, synonyms |
+| Analysis | one simple type (`text_simple`: standard tokenizer, lowercase, ascii folding) | `text_en_fold` (description, reviews), `text_pt_fold` (Wikipedia), `text_multi`; no synonyms (left for M3) |
 | Listing text `qf` / `pf` | `name^3 description^2 host_about^0.5` / `name^6 description^4`, `ps=2`, `tie=0.1`, `mm=2<-1 5<50%` | same |
 | Evidence from children | none | `{!parent}` score of reviews (`^0.5`, `score=avg`) and of POIs (`^0.3`, `score=max`), combined with OR so that a listing can be found through them |
 | Quality boost | none | multiplicative `1 + 0.1·rating + 0.02·ln(1 + number_of_reviews)` (about 1.0–1.6) |
@@ -115,7 +117,7 @@ The setups share the data, the hard filters and the listing-text edismax paramet
 the same for both (`scripts/solr_query.py query.json --setup configs/setup1.json configs/setup2.json`). The
 difference in results therefore comes from three things, each with a reason:
 1. **Nested reviews and POIs**: users ask about experience and surroundings, which only exist in the children. Cost: far more documents (in the 3,000-listing test below, 117,721 review and 88,919 POI children for 3,000 parents), and each of the 291,355 POI children with an article repeats its full Wikipedia text.
-2. **Language-aware analysis**: 43 % of the reviews are not English, and with a simple analyzer plurals and verb forms never match. Translation to English plus English stemming and synonyms puts the reviews of the six translated languages in one searchable vocabulary.
+2. **Language-aware analysis**: 43 % of the reviews are not English, and with a simple analyzer plurals and verb forms never match. Translation to English plus English stemming puts the reviews of the six translated languages in one searchable vocabulary.
 3. **Boosts**: rating and popularity break ties between textually similar listings.
 
 Limits of the comparison: setup 2 changes three factors at once, so it tells whether the whole is better, not
@@ -170,5 +172,5 @@ Moments - Apartamento com Elevador").
 make solr-up      # docker compose: cores airbnb_s1 and airbnb_s2
 make translate    # optional, about 10 hours: English text of the fr, pt, es, de, it, nl reviews
 make index        # both setups; ARGS="--limit 3000" indexes only the first 3,000 listings
-python scripts/solr_query.py scripts/queries/rural_quiet.json --setup configs/setup1.json configs/setup2.json
+python scripts/solr_query.py <query.json> --setup configs/setup1.json configs/setup2.json
 ```

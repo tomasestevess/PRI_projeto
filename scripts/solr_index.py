@@ -3,8 +3,11 @@
 Setup 1 indexes the listings alone; setup 2 sends each listing as a parent document with its reviews and pois
 as nested child documents (see configs/ and docs/report_solr_schema.md).
 
+The schema that is applied is also written to configs/schema_<setup>.json, in the Schema API format
+(add-field-type, add-field), so the repository always has the exact schema of each core.
+
 Usage: python scripts/solr_index.py --setup configs/setup2.json [--solr http://localhost:8983/solr]
-                                    [--batch 200] [--limit N] [--reset]
+                                    [--batch 200] [--limit N] [--reset] [--schema-only]
 """
 import argparse
 import json
@@ -19,7 +22,7 @@ from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # data_processing.py sits at the repo root
 import data_processing as dp
-from solr_analysis import define_analysis
+from solr_analysis import define_analysis, field_types
 from translate_reviews import load_translations
 
 DOCS = "data/processed/documents.jsonl"
@@ -68,17 +71,32 @@ def schema_fields(schema):
     return fields
 
 
+# _nest_parent_ holds the id of the parent listing of each review and POI; Solr fills it when the field exists
+NEST_PARENT = {"name": "_nest_parent_", "type": "string", "indexed": True, "stored": True}
+
+
+def schema_json(solr, config):
+    """The schema of a setup in the Schema API format: its text field types and every field it declares.
+    The other field types (string, pint, pfloat, plong, pdate, location) come with Solr's _default configset."""
+    return {"add-field-type": field_types(solr, config["analysis"]),
+            "add-field": schema_fields(config["schema"]) + [NEST_PARENT]}
+
+
+def schema_path(config):
+    return Path(__file__).resolve().parent.parent / "configs" / f"schema_{config['setup']}.json"
+
+
 def define_schema(solr, config):
     # The _default configset guesses the type of unknown fields (schemaless); here every field is declared
     call(f"{solr}/config", {"set-user-property": {"update.autoCreateFields": "false"}})
-    define_analysis(solr, config["analysis"], config["synonyms"])
+    schema = schema_json(solr, config)
+    schema_path(config).write_text(json.dumps(schema, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    define_analysis(solr, config["analysis"], config["synonyms"], schema["add-field-type"])
     for name in DROP:
         if exists(solr, name):
             call(f"{solr}/schema", {"delete-field": {"name": name}})
     # Fields may already exist when the script is rerun, so replace instead of add
-    # _nest_parent_ holds the id of the parent listing of each review and POI; Solr fills it when the field exists
-    nest_parent = {"name": "_nest_parent_", "type": "string", "indexed": True, "stored": True}
-    for f in schema_fields(config["schema"]) + [nest_parent]:
+    for f in schema["add-field"]:
         r = json.loads(call(f"{solr}/schema", {"add-field": f}) if not exists(solr, f["name"])
                        else call(f"{solr}/schema", {"replace-field": f}))
         assert "errors" not in r, r
@@ -165,11 +183,16 @@ def main():
     ap.add_argument("--batch", type=int, default=200)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--reset", action="store_true", help="delete every document before indexing")
+    ap.add_argument("--schema-only", action="store_true",
+                    help="only define the schema (and write configs/schema_<setup>.json), without indexing")
     args = ap.parse_args()
 
     config = json.loads(Path(args.setup).read_text(encoding="utf-8"))
     solr = f"{args.solr.rstrip('/')}/{config['core']}"
     define_schema(solr, config)
+    print(f"schema written to configs/{schema_path(config).name}")
+    if args.schema_only:
+        return
     density = PoiDensity()
     translations = load_translations() if config["nested"]["reviews"] else {}
     print(f"{len(translations)} translated reviews")

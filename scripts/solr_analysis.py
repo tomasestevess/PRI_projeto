@@ -11,6 +11,7 @@ Each entry of "analysis" has a `name` and a `kind`:
            (before the stop filter, so synonyms are written with their accents).
 
 Synonyms are stored in managed resources (one per language, `syn_<lang>`), loaded from SYNONYMS below.
+They are left for M3: no setup of M2 lists them, so the M2 comparison is made without synonyms.
 """
 import json
 import urllib.parse
@@ -80,13 +81,24 @@ def _put_type(ftype):
     assert "errors" not in r, r
 
 
-def define_analysis(solr, analysis, synonym_langs):
+def field_types(solr, analysis):
+    """The text field types of a setup, as Schema API definitions. `derived` types read their base from Solr."""
     global _solr
     _solr = solr
+    types = []
     for spec in analysis:
         index, query = KINDS[spec["kind"]](spec)
-        _put_type({"name": spec["name"], "class": "solr.TextField", "positionIncrementGap": "100",
-                   "indexAnalyzer": index, "queryAnalyzer": query})
+        types.append({"name": spec["name"], "class": "solr.TextField", "positionIncrementGap": "100",
+                      "indexAnalyzer": index, "queryAnalyzer": query})
+    return types
+
+
+def define_analysis(solr, analysis, synonym_langs, types=None):
+    """Adds or replaces the text field types (computed with field_types unless given) and loads the synonyms."""
+    global _solr
+    _solr = solr
+    for ftype in types if types is not None else field_types(solr, analysis):
+        _put_type(ftype)
     if synonym_langs:
         load_synonyms(solr, synonym_langs)
 
