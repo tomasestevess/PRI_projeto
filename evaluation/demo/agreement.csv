@@ -1,0 +1,4 @@
+qid,raters,judged_by_both,percent_agreement,cohen_kappa
+IN1,rel_A-rel_B,17,0.412,-0.149
+IN3,rel_A-rel_B,19,0.474,-0.080
+IN5,rel_C-rel_D,19,0.368,-0.239

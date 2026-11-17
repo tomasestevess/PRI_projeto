@@ -10,17 +10,20 @@ Rows are sorted by docid, not by rank, so raters are not biased by the order of 
 import argparse
 import csv
 import json
+import re
 import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
 RATERS = ["rel_A", "rel_B", "rel_C", "rel_D"]
-FIELDS = "id,name,neighbourhood_cleansed,price,accommodates,listing_url"
+FIELDS = ("id,name,neighbourhood_cleansed,price,accommodates,listing_url,"
+          "property_type,bedrooms,beds,review_scores_checkin,amenities,description")
+DESCRIPTION_CHARS = 400
 
 
 def read_run(path):
-    ranks = defaultdict(dict)  
+    ranks = defaultdict(dict)
     # qid -> docid -> rank
     for line in Path(path).read_text(encoding="utf-8").splitlines():
         qid, _, docid, rank, _, _ = line.split()
@@ -42,8 +45,22 @@ def fetch_metadata(solr, config, docids):
     return {d["id"]: d for d in docs}
 
 
+def as_text(value):
+    # multivalued fields come back as lists; join them into one cell
+    if isinstance(value, list):
+        value = "; ".join(str(v) for v in value)
+    return "" if value is None else str(value)
+
+
+def clean_description(value):
+    # strip HTML tags and line breaks so the cell stays readable in a spreadsheet, and cut it short
+    text = re.sub(r"<[^>]+>", " ", as_text(value))
+    text = re.sub(r"\s+", " ", text).strip()
+    return text if len(text) <= DESCRIPTION_CHARS else text[:DESCRIPTION_CHARS].rstrip() + "..."
+
+
 def build_pool(names, runs, k):
-    pool = defaultdict(dict)  
+    pool = defaultdict(dict)
     # qid -> docid -> {setup_name: rank}
     for name, run in zip(names, runs):
         for qid, docs in run.items():
@@ -59,14 +76,18 @@ def write_pool(path, pool, meta, names):
     # write the pool to a CSV file with the specified columns
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "listing_url",
+        w.writerow(["qid", "docid", "name", "neighbourhood_cleansed", "price", "accommodates", "bedrooms", "beds",
+                    "property_type", "review_scores_checkin", "amenities", "description", "listing_url",
                     *[f"rank_{n}" for n in names], *RATERS, "final"])
         for qid in sorted(pool):
             print(f"{qid}: {len(pool[qid])} unique documents in the pool")
             for docid in sorted(pool[qid]):
                 d = meta.get(docid, {})
-                w.writerow([qid, docid, d.get("name", ""), d.get("neighbourhood_cleansed", ""),
-                            d.get("price", ""), d.get("accommodates", ""), d.get("listing_url", ""),
+                w.writerow([qid, docid, as_text(d.get("name")), as_text(d.get("neighbourhood_cleansed")),
+                            as_text(d.get("price")), as_text(d.get("accommodates")), as_text(d.get("bedrooms")),
+                            as_text(d.get("beds")), as_text(d.get("property_type")),
+                            as_text(d.get("review_scores_checkin")), as_text(d.get("amenities")),
+                            clean_description(d.get("description")), as_text(d.get("listing_url")),
                             *[pool[qid][docid].get(n, "") for n in names], *[""] * (len(RATERS) + 1)])
 
 
@@ -96,4 +117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
