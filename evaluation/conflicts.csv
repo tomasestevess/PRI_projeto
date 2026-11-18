@@ -1,19 +1,19 @@
 qid,docid,answers,kept,resolved
 IN1,listing_1005822784173733202,A=1; B=1; C=1; D=0,1,majority
-IN1,listing_1120133192161892590,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN1,listing_1153057606818342481,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN1,listing_1308134383177214884,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN1,listing_1463678236450206648,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN1,listing_1471625041307476212,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN1,listing_1488293179654975192,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN1,listing_1120133192161892590,A=1; B=1; C=0; D=0,0,yes
+IN1,listing_1153057606818342481,A=0; B=0; C=1; D=1,1,yes
+IN1,listing_1308134383177214884,A=0; B=0; C=1; D=1,1,yes
+IN1,listing_1463678236450206648,A=0; B=0; C=1; D=1,1,yes
+IN1,listing_1471625041307476212,A=0; B=0; C=1; D=1,1,yes
+IN1,listing_1488293179654975192,A=1; B=1; C=0; D=0,0,yes
 IN1,listing_1531919604534270324,A=1; B=1; C=1; D=0,1,majority
 IN1,listing_1592640456514764305,A=0; B=0; C=0; D=1,0,majority
-IN1,listing_1609488426688011018,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN1,listing_17956449,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
+IN1,listing_1609488426688011018,A=0; B=0; C=1; D=1,1,yes
+IN1,listing_17956449,A=0; B=0; C=1; D=1,1,yes
 IN1,listing_17961827,A=0; B=1; C=1; D=1,1,majority
 IN1,listing_17961987,A=0; B=1; C=1; D=1,1,majority
-IN1,listing_19736007,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN1,listing_23303747,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN1,listing_19736007,A=1; B=0; C=0; D=1,1,yes
+IN1,listing_23303747,A=1; B=0; C=0; D=1,1,yes
 IN1,listing_28283531,A=1; B=0; C=0; D=0,0,majority
 IN1,listing_30445243,A=1; B=1; C=1; D=0,1,majority
 IN1,listing_31332452,A=0; B=1; C=1; D=1,1,majority
@@ -22,10 +22,10 @@ IN1,listing_38040155,A=0; B=1; C=1; D=1,1,majority
 IN1,listing_39404678,A=0; B=0; C=0; D=1,0,majority
 IN1,listing_41073219,A=1; B=0; C=0; D=0,0,majority
 IN1,listing_45204730,A=0; B=1; C=1; D=1,1,majority
-IN1,listing_50125411,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN1,listing_50125411,A=0; B=1; C=0; D=1,0,yes
 IN1,listing_52261530,A=0; B=1; C=1; D=1,1,majority
 IN1,listing_54271429,A=0; B=0; C=1; D=0,0,majority
-IN1,listing_54275335,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN1,listing_54275335,A=0; B=1; C=0; D=1,0,yes
 IN1,listing_573900929484567398,A=0; B=0; C=1; D=0,0,majority
 IN1,listing_575205165897437855,A=1; B=0; C=0; D=0,0,majority
 IN1,listing_575245127137297096,A=1; B=0; C=0; D=0,0,majority
@@ -33,91 +33,91 @@ IN1,listing_621618477672156333,A=0; B=0; C=1; D=0,0,majority
 IN1,listing_623784317996413864,A=1; B=1; C=0; D=1,1,majority
 IN1,listing_623784467380583491,A=1; B=1; C=0; D=1,1,majority
 IN1,listing_675482355213625311,A=1; B=1; C=0; D=1,1,majority
-IN1,listing_7034877,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
-IN1,listing_7081043,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN1,listing_7034877,A=0; B=1; C=0; D=1,0,yes
+IN1,listing_7081043,A=0; B=1; C=0; D=1,0,yes
 IN1,listing_7581958,A=1; B=0; C=0; D=0,0,majority
 IN1,listing_7586377,A=0; B=1; C=1; D=1,1,majority
 IN1,listing_761588352487398656,A=0; B=0; C=1; D=0,0,majority
 IN1,listing_997074620111105661,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_1013643647498884537,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1065031161310594411,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1065031161310594411,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_1067391236287365408,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_10880059,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1089200961790740510,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1119377781452203690,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1127444366214007500,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1089200961790740510,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1119377781452203690,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1127444366214007500,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_11487717,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_11696835,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_1211792225975636736,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1258603801568811808,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1258603801568811808,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_1268779477477792605,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1336229379503867217,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1374508298610446284,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1412189163519870276,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1421108442610549116,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1444210863893117619,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1336229379503867217,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1374508298610446284,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1412189163519870276,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1421108442610549116,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1444210863893117619,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_14486249,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1450586812323552580,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1455048241798581007,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1490344254203055566,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1491749127384895607,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1497107029876213691,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1603758223602032223,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1616873714794754890,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1630362252805002156,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1450586812323552580,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1455048241798581007,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1490344254203055566,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1491749127384895607,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1497107029876213691,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1603758223602032223,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1616873714794754890,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1630362252805002156,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_1631129487312404734,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_1641185908574230661,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN2,listing_1653006976344686670,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN2,listing_1641185908574230661,A=1; B=1; C=0; D=0,0,yes
+IN2,listing_1653006976344686670,A=1; B=1; C=0; D=0,0,yes
 IN2,listing_1670302978259368106,A=1; B=1; C=0; D=1,1,majority
-IN2,listing_16992128,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_17206907,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_17621266,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_16992128,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_17206907,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_17621266,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_18544293,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_19187878,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_19268772,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_19268772,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_19601941,A=0; B=0; C=0; D=1,0,majority
 IN2,listing_19636220,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_19641654,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_19718646,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_2055113,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_19718646,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_2055113,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_21557185,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_23135015,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_23233446,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_2419436,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_23135015,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_23233446,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_2419436,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_24730772,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_26057651,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_26057651,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_26198864,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_27157799,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_27157799,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_27193971,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_27247881,A=0; B=0; C=0; D=1,0,majority
-IN2,listing_27270717,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_27270717,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_27324622,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_27330646,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_27330646,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_27820673,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_29070203,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_32355445,A=0; B=0; C=0; D=1,0,majority
-IN2,listing_32855174,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_32894948,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_33097538,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_34082020,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_32855174,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_32894948,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_33097538,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_34082020,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_35768796,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_35994903,A=0; B=0; C=0; D=1,0,majority
-IN2,listing_36034926,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_36075401,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_37960125,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_41001373,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_36034926,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_36075401,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_37960125,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_41001373,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_43728728,A=0; B=0; C=0; D=1,0,majority
 IN2,listing_4385270,A=0; B=0; C=0; D=1,0,majority
 IN2,listing_44135096,A=0; B=0; C=0; D=1,0,majority
 IN2,listing_44202109,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_45168894,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN2,listing_45777973,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_45168894,A=1; B=0; C=0; D=1,1,yes
+IN2,listing_45777973,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_47529034,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_49946997,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_52696404,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_52696404,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_5344178,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_53907006,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_547502,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_547502,A=1; B=0; C=0; D=1,1,yes
 IN2,listing_568718004839473733,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_581659185780195939,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_619354998862049574,A=1; B=0; C=0; D=0,0,majority
@@ -134,7 +134,7 @@ IN2,listing_703640953344388331,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_7139170,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_722420551083084547,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_725260025110868933,A=1; B=0; C=0; D=0,0,majority
-IN2,listing_7782467,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN2,listing_7782467,A=0; B=1; C=0; D=1,0,yes
 IN2,listing_799742853386879073,A=1; B=1; C=0; D=1,1,majority
 IN2,listing_862209239532027654,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_875351613648110764,A=1; B=1; C=0; D=1,1,majority
@@ -142,17 +142,17 @@ IN2,listing_887387689592535989,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_896945711375879252,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_948337194305555925,A=1; B=0; C=0; D=0,0,majority
 IN2,listing_961386566833223297,A=1; B=0; C=0; D=0,0,majority
-IN3,listing_1304343147739929280,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
-IN3,listing_1304360460160969012,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN3,listing_1304343147739929280,A=1; B=1; C=0; D=0,0,yes
+IN3,listing_1304360460160969012,A=1; B=1; C=0; D=0,0,yes
 IN3,listing_13263503,A=1; B=1; C=0; D=1,1,majority
 IN3,listing_13490682,A=0; B=0; C=0; D=1,0,majority
-IN3,listing_14426380,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN3,listing_14426380,A=1; B=1; C=0; D=0,0,yes
 IN3,listing_1478829153820975719,A=1; B=1; C=1; D=0,1,majority
 IN3,listing_1533473518026244092,A=1; B=1; C=1; D=0,1,majority
-IN3,listing_1544245563281375891,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN3,listing_1544245563281375891,A=1; B=1; C=0; D=0,0,yes
 IN3,listing_1589939608888639964,A=0; B=0; C=0; D=1,0,majority
-IN3,listing_16394442,A=0; B=0; C=1; D=1,0,"no (tie, kept 0)"
-IN3,listing_1686301408815844925,A=1; B=1; C=0; D=0,0,"no (tie, kept 0)"
+IN3,listing_16394442,A=0; B=0; C=1; D=1,1,yes
+IN3,listing_1686301408815844925,A=1; B=1; C=0; D=0,0,yes
 IN3,listing_17957696,A=1; B=0; C=0; D=0,0,majority
 IN3,listing_19485703,A=0; B=1; C=1; D=1,1,majority
 IN3,listing_270094,A=0; B=1; C=1; D=1,1,majority
@@ -166,17 +166,17 @@ IN3,listing_659322563220983657,A=1; B=0; C=0; D=0,0,majority
 IN3,listing_731778450025812803,A=0; B=1; C=1; D=1,1,majority
 IN3,listing_732493983445325405,A=1; B=0; C=0; D=0,0,majority
 IN3,listing_748374628133522421,A=1; B=1; C=0; D=1,1,majority
-IN3,listing_866739994173388895,A=1; B=0; C=1; D=0,0,"no (tie, kept 0)"
+IN3,listing_866739994173388895,A=1; B=0; C=1; D=0,1,yes
 IN3,listing_868163894295620757,A=1; B=1; C=0; D=1,1,majority
 IN3,listing_914426314576182170,A=1; B=0; C=0; D=0,0,majority
-IN3,listing_928839901953721017,A=1; B=0; C=1; D=0,0,"no (tie, kept 0)"
-IN3,listing_929716718224619092,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN3,listing_928839901953721017,A=1; B=0; C=1; D=0,1,yes
+IN3,listing_929716718224619092,A=0; B=1; C=0; D=1,0,yes
 IN3,listing_994672017435466650,A=1; B=0; C=0; D=0,0,majority
 IN4,listing_12589469,A=0; B=0; C=0; D=1,0,majority
 IN4,listing_14525293,A=0; B=0; C=0; D=1,0,majority
 IN4,listing_2972233,A=0; B=0; C=0; D=1,0,majority
 IN4,listing_3329105,A=1; B=0; C=0; D=0 (?),0,majority
-IN4,listing_428785,A=1; B=0; C=0; D=1,0,"no (tie, kept 0)"
-IN4,listing_597638845600712801,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN4,listing_428785,A=1; B=0; C=0; D=1,1,yes
+IN4,listing_597638845600712801,A=0; B=1; C=0; D=1,0,yes
 IN4,listing_619755,A=1; B=0; C=0; D=0,0,majority
-IN4,listing_678954023743222665,A=0; B=1; C=0; D=1,0,"no (tie, kept 0)"
+IN4,listing_678954023743222665,A=0; B=1; C=0; D=1,0,yes
