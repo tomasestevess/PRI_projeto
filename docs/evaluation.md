@@ -355,25 +355,13 @@ The qrels-based tie-ablation evaluation can be run as documented in `docs/tie-ab
 make tie-ablation ARGS="--qrels evaluation/qrels.txt"
 ```
 
-## 12. Overall status assessment
-
-The repository contains a **substantial and seemingly complete M2 evaluation implementation**, including the manual-assessment infrastructure, four assessor judgement files, qrels, agreement analysis, metric outputs, PR plots, setup comparison, and tie ablation.
-
-The main remaining risk is not a missing evaluation component in the code. It is **final verification and interpretation**:
-1. confirm that the checked-in outputs correspond to the latest retrieval runs and final query/configuration files;
-2. confirm that the qrels are complete and all ties/resolutions are intentional;
-3. verify whether the tie ablation was evaluated with the final qrels, as its documentation describes this as a confirmation step;
-4. ensure the report/presentation explain the low agreement on IN2 and the negative Setup 2 result for IN4.
-
-This assessment is based on the contents of the provided project archive and the M2 requirements in *Project Rules, PRI M.EIC 26/27*. The archive does not include the generated main run files, so their exact provenance and freshness could not be independently checked here.
-
 ---
 
-# 13. Detailed interpretation of the retrieval results
+# 12. Detailed interpretation of the retrieval results
 
 This section goes beyond reporting metric values and explains what the observed scores suggest about each retrieval setup. The interpretation is descriptive: the experiment contains four information needs, so the results are useful for identifying query-specific strengths and weaknesses, but they do not establish statistically significant general improvements.
 
-## 13.1 How to read the metrics together
+## 12.1 How to read the metrics together
 
 Metrics should not be interpreted in isolation:
 
@@ -387,7 +375,7 @@ Metrics should not be interpreted in isolation:
 
 A good interpretation therefore asks whether a setup improves **early precision**, **ranking order**, and **coverage of relevant documents** at the same time. A higher P@50 alone does not guarantee that the best results are at the top; nDCG and AP help reveal that distinction.
 
-## 13.2 Overall comparison: a modest average gain, not a universal winner
+## 12.2 Overall comparison: a modest average gain, not a universal winner
 
 | Mean metric | Setup 1 | Setup 2 | Change (Setup 2 − Setup 1) |
 |---|---:|---:|---:|
@@ -410,7 +398,7 @@ Across the four needs, Setup 2 is better on average for every metric in this tab
 
 The most notable aggregate change is nDCG@10 (+0.0758): the enriched setup tends to improve the quality/order of the first ten results across the needs. Recall@50 also increases by around 0.0603, indicating that Setup 2 finds a larger fraction of the judged-relevant listings within its top 50 on average. MAP rises from 0.3518 to 0.3784, an absolute improvement of 0.0266. That is a real difference in the saved outputs, but its practical value varies considerably by information need.
 
-## 13.3 IN1 — Quiet apartment near historic monuments in Porto
+## 12.3 IN1 — Quiet apartment near historic monuments in Porto
 
 | Metric | Setup 1 | Setup 2 | Change |
 |---|---:|---:|---:|
@@ -430,7 +418,7 @@ The most notable aggregate change is nDCG@10 (+0.0758): the enriched setup tends
 
 **Judgement coverage caveat.** Only 78% of Setup 2's top 50 for IN1 are judged in the saved qrels (`judged@50=0.78`). Thus the P@50, nDCG@50, AP and recall comparisons for this run are incomplete with respect to the retrieved list: unjudged listings are treated as non-relevant. The reported values can underestimate Setup 2's performance. This coverage issue is important when discussing the slight loss at deeper cutoffs.
 
-## 13.4 IN2 — Family beach holiday in Lisbon
+## 12.4 IN2 — Family beach holiday in Lisbon
 
 | Metric | Setup 1 | Setup 2 | Change |
 |---|---:|---:|---:|
@@ -450,7 +438,7 @@ The most notable aggregate change is nDCG@10 (+0.0758): the enriched setup tends
 
 **Important qualification.** The very low IN2 agreement (κ=0.057) means the relevance labels themselves are uncertain for this need. The retrieval improvement is striking in the metrics, but it should be reported alongside the disagreement and not as an unquestionable ground-truth result. The judging criteria should be reviewed and example disagreements inspected before making a strong claim.
 
-## 13.5 IN3 — Late arrival / easy self check-in
+## 12.5 IN3 — Late arrival / easy self check-in
 
 | Metric | Setup 1 | Setup 2 | Change |
 |---|---:|---:|---:|
@@ -468,7 +456,7 @@ The most notable aggregate change is nDCG@10 (+0.0758): the enriched setup tends
 
 **Interpretation.** Since IN3 explicitly depends on review evidence, the enriched retrieval design is well aligned with this need. The results support a ranking-quality improvement, particularly near the top, rather than an increase in the number of relevant listings found by rank 50. This is a useful example of why P@50 alone would miss an important change.
 
-## 13.6 IN4 — Accessible stay / functioning elevator
+## 12.6 IN4 — Accessible stay / functioning elevator
 
 | Metric | Setup 1 | Setup 2 | Change |
 |---|---:|---:|---:|
@@ -488,7 +476,7 @@ The most notable aggregate change is nDCG@10 (+0.0758): the enriched setup tends
 
 **Judgement coverage caveat.** Setup 2's top 50 is only 78% judged (`judged@50=0.78`), so its performance may be underestimated. The coverage deficit does not automatically explain the large gap, but the comparison should be repeated after judging the missing top-50 documents before treating the magnitude as definitive.
 
-## 13.7 Cross-need conclusion
+## 12.7 Cross-need conclusion
 
 The observed behaviour suggests a trade-off between broad, evidence-enriched matching and focused retrieval from the listing's own text:
 
@@ -501,7 +489,7 @@ This pattern suggests that Setup 2 is promising as an overall retrieval architec
 
 ---
 
-# 13. Inter-assessor agreement: deeper interpretation and limitations
+# 12. Inter-assessor agreement: deeper interpretation and limitations
 
 Fleiss' kappa is chance-corrected: it compares observed agreement with the agreement that would be expected if assessors independently assigned labels according to the overall label frequencies. Consequently, a high raw agreement does not necessarily imply a high kappa, and kappa can be sensitive to the prevalence of the two labels. The values below should be read together with both `observed_agreement` and `all_agree`.
 
@@ -525,7 +513,7 @@ Do not present overall κ=0.593 as though every need had the same judgement reli
 
 ---
 
-# 14. Evaluation limitations and claims that the data supports
+# 13. Evaluation limitations and claims that the data supports
 
 1. **Incomplete judgement coverage in some top-50 lists.** Setup 2 IN1 and IN4 each have `judged@50=0.78`; Setup 2's aggregate judged@50 is 0.89. Unjudged results are treated as non-relevant by the evaluator. The affected P, nDCG, AP and recall results may therefore be lower-bound estimates. Complete the missing judgements and rerun metrics before finalising conclusions about those cases.
 2. **Unequal reliability across information needs.** IN2 has very low kappa (0.057), so its qrels have lower confidence. This is especially important because IN2 produces the largest Setup 2 improvement and contributes strongly to the aggregate gain. The result is promising, but should be qualified and followed by disagreement inspection.
@@ -542,7 +530,7 @@ Do not present overall κ=0.593 as though every need had the same judgement reli
 
 ---
 
-# 15. `tie` ablation — relevance-based results available in the CSV
+# 14. `tie` ablation — relevance-based results available in the CSV
 
 The repository's `evaluation/tie_ablation.csv` contains AP values for each tested `tie` value, so the relevance-based comparison is already represented in the archived CSV. Averaging AP across the four needs and both setups gives:
 
